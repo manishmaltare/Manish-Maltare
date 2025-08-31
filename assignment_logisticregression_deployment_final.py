@@ -83,7 +83,6 @@ features.head()
 features.nunique()
 
 # removing ticket as its having 76% on unique values as string & integers.
-features=features.drop(['Ticket'],axis=1)
 
 features['Cabin']=le.fit_transform(features['Cabin'])
 
