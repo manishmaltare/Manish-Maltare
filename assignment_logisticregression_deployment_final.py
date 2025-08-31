@@ -8,7 +8,6 @@ Original file is located at
 """
 
 import pandas as pd # LOAD DATASET
-import joblib
 
 features = pd.read_csv('/content/Titanic_train.csv')
 
