@@ -9,9 +9,9 @@ Original file is located at
 
 import pandas as pd # LOAD DATASET
 
-features = pd.read_csv('/content/Titanic_train.csv')
+features = pd.read_csv('Titanic_train.csv')
 
-target = pd.read_csv('/content/Titanic_test.csv')
+target = pd.read_csv('Titanic_test.csv')
 
 # FEATURE EXTRACTION - i did perform it before EDA- 1 as the feature & target variable are given
 # separately.
