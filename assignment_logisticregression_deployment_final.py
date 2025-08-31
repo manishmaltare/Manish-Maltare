@@ -9,7 +9,6 @@ Original file is located at
 
 import pandas as pd # LOAD DATASET
 import joblib
-! pip install streamlit
 
 features = pd.read_csv('/content/Titanic_train.csv')
 
