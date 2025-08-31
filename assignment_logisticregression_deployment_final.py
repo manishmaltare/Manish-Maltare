@@ -354,6 +354,9 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
+git add requirements.txt
+git commit -m "Add requirements.txt for deployment"
+git push
 
 # ------------------- PAGE CONFIG -------------------
 st.set_page_config(
