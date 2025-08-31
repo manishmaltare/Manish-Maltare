@@ -195,26 +195,6 @@ from sklearn.metrics import classification_report
 cr=classification_report(y_pred,y_train)
 
 print(cr)
-# Training accuracy or F1-Score is 80%, which means its a good model.
-# not survived are = 466
-# survived are = 246
-
-import statsmodels.api as sm
-
-X=sm.add_constant(x_train)
-
-reasult=model.fit(x_train,y_train)
-
-logit_model=sm.Logit(y_train,X)
-
-reasult=logit_model.fit()
-
-print(reasult.summary())
-# Overall Pseudo R - square value is 32% which is above 30%, implies that the model is moderately accurate
-# Total 4- varibale are significant having values < 0.05 (p-values)
-# which are : Pclass, Sex, Age,Sibsp
-# Embarked variable is moderately significant.
-# Fare is highly insignigficant, followed by Parch & Cabin - moderately insignificant
 
 column_names
 
