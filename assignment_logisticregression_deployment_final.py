@@ -8,7 +8,7 @@ Original file is located at
 """
 
 import pandas as pd # LOAD DATASET
-
+import joblib
 features = pd.read_csv('Titanic_train.csv')
 
 target = pd.read_csv('Titanic_test.csv')
@@ -315,7 +315,6 @@ model
 
 import streamlit as st
 import pandas as pd
-import joblib
 import numpy as np
 
 # ------------------- PAGE CONFIG -------------------
