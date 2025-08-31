@@ -129,43 +129,6 @@ data_merged.shape
 
 data_merged.size
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-z=data_merged.corr(numeric_only=True)
-
-sns.heatmap(z,annot=True,annot_kws={'size': 12})
-plt.show()
-# Here the map shows that only Parch & Fare are positively coreleated, with Survived.
-# which indicates that survival rate increases with no of parents & fare.
-# Pclass is higly inversly corelated as comapre to Age & SibSp.
-# which indicates that 1st class passenges have more chances of survival, as total count of 1st class is 216 & 3rd class is 1473.
-# SibSp & Parch are mutully corelated variables.
-# Fare & Survival comes in 2nd place.
-# which indicates that with increase of fair , survival rate increases.
-
-data_merged.columns
-
-sns.pairplot(data_merged)
-
-sns.boxplot(data_merged)
-# Fare has too many outliers, indicates the people with
-# high fares (1st & 2nd class) are very low in no. as median is also low to 10-15
-# Age shows that elderly people are very less (as outliers)
-# The median likely to be between 25-35 years old
-
-sns.displot(data_merged)
-
-
-
-data_merged.info()
-
-data_merged.describe()
-# Age , the average is 29.88 years. Max is 88 years old.
-# Fare, Max. fare price is 512, avg is 33.29 units.
-# Pclass, mean is 2.29 indicates that most people are of middle income group (2nd class).
-# 75% people are from calss 3rd, which means majority people travelling are of class 3rd.
-
 target['Sex']=le.fit_transform(target['Sex'])
 
 target['Embarked']=le.fit_transform(target['Embarked'])
