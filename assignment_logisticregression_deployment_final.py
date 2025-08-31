@@ -423,10 +423,10 @@ if st.button('Predict Survival'):
     else:
         st.error(f"❌ Not likely to survive. Probability: {probability:.2%}")
 
-! wget -q -o - ipv4.canhanzip.com
+wget -q -o - ipv4.canhanzip.com
  # canhapzip allows us to build domain into scripts to automatically determine
  # what is your public IP address from any system of the earth.
 
-! streamlit run app.py & npx localtunnel --port 8501
+streamlit run app.py & npx localtunnel --port 8501
 # local tunnel allows us to easily web service on your local network
 # machine
