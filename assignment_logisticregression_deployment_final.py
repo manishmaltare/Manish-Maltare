@@ -96,7 +96,7 @@ target.nunique()
 
 target.columns
 
-target=target.drop(['PassengerId','Name','Ticket'],axis=1)
+target=target.drop(['PassengerId','Name'],axis=1)
 
 target.head()
 
