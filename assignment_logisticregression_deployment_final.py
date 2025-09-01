@@ -337,4 +337,3 @@ if st.button('Predict Survival'):
         st.success(f"🎉 Likely to **SURVIVE**! Probability: {probability:.2%}")
     else:
         st.error(f"❌ Not likely to survive. Probability: {probability:.2%}")
-
