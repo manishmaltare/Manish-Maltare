@@ -64,6 +64,8 @@ features.nunique()
 
 features=features.drop(['PassengerId','Name'],axis=1)
 
+features=features.drop(['Ticket'],axis=1)
+
 features.head()
 
 # DATA PREPROCESSING : - "Encode categorical data"
