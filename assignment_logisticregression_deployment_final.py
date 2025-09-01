@@ -260,6 +260,7 @@ import pandas as pd
 import numpy as np
 import joblib
 
+
 # ------------------- PAGE CONFIG -------------------
 st.set_page_config(
     page_title="Titanic Survival Prediction App",
@@ -283,12 +284,12 @@ model, scaler = load_model_and_scaler()
 # ------------------- MAPPINGS -------------------
 # Ensure these match the LabelEncoder classes used during training
 SEX_MAPPING = {'Female': 0, 'Male': 1}
-EMBARKED_MAPPING = {'S': 2, 'C' : 0, 'Q': 1 }
-CABIN_MAPPING = {'U': 8, 'C' : 2,'B':1, 'D' : 3, 'E':4, 'A': 0 , 'F' : 5, 'G' :6, 'T' : 7}
+EMBARKED_MAPPING = {'S': 2, 'C': 0, 'Q': 1}
+CABIN_MAPPING = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
 
 # ------------------- TITLE -------------------
 st.title("🚢 Titanic Survival Prediction App")
-st.write("Fill in the passenger details below to get the prediction:")
+st.write("Fill in the passenger details below to get the survival prediction:")
 
 # ------------------- INPUT LAYOUT -------------------
 col1, col2 = st.columns(2)
@@ -337,3 +338,4 @@ if st.button('Predict Survival'):
         st.success(f"🎉 Likely to **SURVIVE**! Probability: {probability:.2%}")
     else:
         st.error(f"❌ Not likely to survive. Probability: {probability:.2%}")
+
