@@ -10,6 +10,7 @@ Original file is located at
 import pandas as pd # LOAD DATASET
 import joblib
 features = pd.read_csv('Titanic_train.csv')
+features = features.drop('Ticket', axis=1)
 
 target = pd.read_csv('Titanic_test.csv')
 
@@ -313,7 +314,6 @@ def predict_survival(features):
     """Predict survival with scaled input."""
     input_df = pd.DataFrame([features],
                             columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
-    input_df = input_df.astype(float)
     input_scaled = scaler.transform(input_df)
     prob = model.predict_proba(input_scaled)[0][1]
     return int(prob >= 0.5), prob
