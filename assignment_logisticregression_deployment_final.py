@@ -11,8 +11,7 @@ import pandas as pd # LOAD DATASET
 import joblib
 features = pd.read_csv('Titanic_train.csv')
 
-if 'Name' in features.columns:
-    features = features.drop(['Name', 'PassengerId', 'Ticket' ], axis=1)
+features = features.drop(columns=[col for col in ['PassengerId', 'Name'] if col in features.columns])
     
 target = pd.read_csv('Titanic_test.csv')
 
