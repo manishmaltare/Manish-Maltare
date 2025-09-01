@@ -313,6 +313,7 @@ def predict_survival(features):
     """Predict survival with scaled input."""
     input_df = pd.DataFrame([features],
                             columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
+    input_df = input_df.astype(float)
     input_scaled = scaler.transform(input_df)
     prob = model.predict_proba(input_scaled)[0][1]
     return int(prob >= 0.5), prob
