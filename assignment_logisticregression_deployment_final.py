@@ -258,6 +258,7 @@ model
 import streamlit as st
 import pandas as pd
 import numpy as np
+import joblib
 
 # ------------------- PAGE CONFIG -------------------
 st.set_page_config(
@@ -266,7 +267,6 @@ st.set_page_config(
 )
 
 # ------------------- CACHING MODEL -------------------
-# Load model and scaler once and reuse across sessions
 @st.cache_resource
 def load_model_and_scaler():
     try:
@@ -281,8 +281,10 @@ def load_model_and_scaler():
 model, scaler = load_model_and_scaler()
 
 # ------------------- MAPPINGS -------------------
-EMBARKED_MAPPING = {0: 'C', 1: 'Q', 2: 'S'}
-CABIN_MAPPING = {0: 'U', 1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'T'}
+# Ensure these match the LabelEncoder classes used during training
+SEX_MAPPING = {'Female': 0, 'Male': 1}
+EMBARKED_MAPPING = {'S': 2, 'C' : 0, 'Q': 1 }
+CABIN_MAPPING = {'U': 8, 'C' : 2,'B':1, 'D' : 3, 'E':4, 'A': 0 , 'F' : 5, 'G' :6, 'T' : 7}
 
 # ------------------- TITLE -------------------
 st.title("🚢 Titanic Survival Prediction App")
@@ -296,28 +298,38 @@ with col1:
                           format_func=lambda x: f"{x} ({'First' if x==1 else 'Second' if x==2 else 'Third'})")
     age = st.number_input('Age', 0, 100, 29)
     parch = st.number_input('Parch', 0, 10, 0, help="Number of Parents/Children Aboard")
-    embarked = st.selectbox('Embarked', EMBARKED_MAPPING.keys(),
-                            format_func=lambda x: EMBARKED_MAPPING[x])
+    embarked = st.selectbox('Embarked', list(EMBARKED_MAPPING.keys()))
 
 with col2:
-    sex = st.selectbox('Sex', [0, 1], format_func=lambda x: 'Female' if x == 0 else 'Male')
+    sex = st.selectbox('Sex', list(SEX_MAPPING.keys()))
     sibsp = st.number_input('SibSp', 0, 10, 0, help="Number of Siblings/Spouses Aboard")
     fare = st.number_input('Fare', 0.0, 600.0, 32.2)
-    cabin = st.selectbox('Cabin', CABIN_MAPPING.keys(), format_func=lambda x: CABIN_MAPPING[x])
+    cabin = st.selectbox('Cabin', list(CABIN_MAPPING.keys()))
 
 # ------------------- PREDICTION FUNCTION -------------------
 @st.cache_data(show_spinner=False)
 def predict_survival(features):
     """Predict survival with scaled input."""
-    input_scaled = scaler.transform(pd.DataFrame([features],
-                                columns=['Pclass','Sex','Age','SibSp','Parch','Fare','Cabin','Embarked']))
+    input_df = pd.DataFrame([features],
+                            columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
+    input_scaled = scaler.transform(input_df)
     prob = model.predict_proba(input_scaled)[0][1]
     return int(prob >= 0.5), prob
 
 # ------------------- BUTTON ACTION -------------------
 if st.button('Predict Survival'):
     with st.spinner('Predicting...'):
-        features = [pclass, sex, age, sibsp, parch, fare, cabin, embarked]
+        # Encode categorical values based on mappings
+        features = [
+            pclass,
+            SEX_MAPPING[sex],
+            age,
+            sibsp,
+            parch,
+            fare,
+            CABIN_MAPPING[cabin],
+            EMBARKED_MAPPING[embarked]
+        ]
         prediction, probability = predict_survival(features)
 
     st.write("---")
