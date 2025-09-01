@@ -257,85 +257,51 @@ model
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
+import numpy as np
 
+# Load the saved model and scaler
+model = joblib.load('logistic_reg_model.pkl')
+scaler = joblib.load('scaler.pkl')
 
-# ------------------- PAGE CONFIG -------------------
-st.set_page_config(
-    page_title="Titanic Survival Prediction App",
-    layout="centered"
-)
-
-# ------------------- CACHING MODEL -------------------
-@st.cache_resource
-def load_model_and_scaler():
-    try:
-        return (
-            joblib.load('logistic_reg_model.pkl'),
-            joblib.load('scaler.pkl')
-        )
-    except FileNotFoundError as e:
-        st.error(f"⚠️ Missing file: {e}. Ensure 'logistic_reg_model.pkl' and 'scaler.pkl' are present.")
-        st.stop()
-
-model, scaler = load_model_and_scaler()
-
-# ------------------- MAPPINGS -------------------
-# Ensure these match the LabelEncoder classes used during training
+# Dictionaries for encoding categorical variables
 SEX_MAPPING = {'Female': 0, 'Male': 1}
 EMBARKED_MAPPING = {'S': 2, 'C': 0, 'Q': 1}
 CABIN_MAPPING = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
 
-# ------------------- TITLE -------------------
-st.title("🚢 Titanic Survival Prediction App")
-st.write("Fill in the passenger details below to get the survival prediction:")
+st.title("Titanic Survival Prediction App")
+st.write("Enter the passenger details to predict survival probability:")
 
-# ------------------- INPUT LAYOUT -------------------
-col1, col2 = st.columns(2)
+# Sidebar for user input
+pclass = st.selectbox("Passenger Class (1 = 1st, 2 = 2nd, 3 = 3rd)", [1, 2, 3])
+sex = st.selectbox("Sex", ["Female", "Male"])
+age = st.number_input("Age", min_value=0, max_value=100, value=30)
+sibsp = st.number_input("Number of Siblings/Spouses aboard", min_value=0, max_value=10, value=0)
+parch = st.number_input("Number of Parents/Children aboard", min_value=0, max_value=10, value=0)
+fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=32.0)
+cabin = st.selectbox("Cabin Deck", ["U","C","B","D","E","A","F","G","T"])
+embarked = st.selectbox("Port of Embarkation", ["S", "C", "Q"])
 
-with col1:
-    pclass = st.selectbox('Pclass', [1, 2, 3],
-                          format_func=lambda x: f"{x} ({'First' if x==1 else 'Second' if x==2 else 'Third'})")
-    age = st.number_input('Age', 0, 100, 29)
-    parch = st.number_input('Parch', 0, 10, 0, help="Number of Parents/Children Aboard")
-    embarked = st.selectbox('Embarked', list(EMBARKED_MAPPING.keys()))
+# Mapping the inputs
+sex_encoded = SEX_MAPPING[sex]
+embarked_encoded = EMBARKED_MAPPING[embarked]
+cabin_encoded = CABIN_MAPPING[cabin]
 
-with col2:
-    sex = st.selectbox('Sex', list(SEX_MAPPING.keys()))
-    sibsp = st.number_input('SibSp', 0, 10, 0, help="Number of Siblings/Spouses Aboard")
-    fare = st.number_input('Fare', 0.0, 600.0, 32.2)
-    cabin = st.selectbox('Cabin', list(CABIN_MAPPING.keys()))
+# Create dataframe for model input
+input_df = pd.DataFrame([[pclass, sex_encoded, age, sibsp, parch, fare, cabin_encoded, embarked_encoded]],
+                        columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
 
-# ------------------- PREDICTION FUNCTION -------------------
-@st.cache_data(show_spinner=False)
-def predict_survival(features):
-    """Predict survival with scaled input."""
-    input_df = pd.DataFrame([features],
-                            columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
-    input_scaled = scaler.transform(input_df)
-    prob = model.predict_proba(input_scaled)[0][1]
-    return int(prob >= 0.5), prob
+# Scale the inputs
+input_scaled = scaler.transform(input_df)
 
-# ------------------- BUTTON ACTION -------------------
-if st.button('Predict Survival'):
-    with st.spinner('Predicting...'):
-        # Encode categorical values based on mappings
-        features = [
-            pclass,
-            SEX_MAPPING[sex],
-            age,
-            sibsp,
-            parch,
-            fare,
-            CABIN_MAPPING[cabin],
-            EMBARKED_MAPPING[embarked]
-        ]
-        prediction, probability = predict_survival(features)
-
-    st.write("---")
-    if prediction:
-        st.success(f"🎉 Likely to **SURVIVE**! Probability: {probability:.2%}")
+# Predict button
+if st.button("Predict Survival"):
+    prediction = model.predict(input_scaled)
+    probability = model.predict_proba(input_scaled)[0][1]  # Probability of survival
+    
+    if prediction[0] == 1:
+        st.success(f"The passenger is likely to SURVIVE with a probability of {probability:.2f}")
     else:
-        st.error(f"❌ Not likely to survive. Probability: {probability:.2%}")
+        st.error(f"The passenger is likely NOT to SURVIVE with a probability of {1 - probability:.2f}")
+
 
