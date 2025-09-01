@@ -10,8 +10,6 @@ Original file is located at
 import pandas as pd # LOAD DATASET
 import joblib
 features = pd.read_csv('Titanic_train.csv')
-
-features = features.drop(columns=[col for col in ['PassengerId', 'Name'] if col in features.columns])
     
 target = pd.read_csv('Titanic_test.csv')
 
