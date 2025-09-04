@@ -9,7 +9,6 @@ Original file is located at
 
 import pandas as pd # LOAD DATASET
 import pickle
-!pip install streamlit
 
 new_df = pd.read_csv('Titanic_train.csv')
 target = pd.read_csv('Titanic_test.csv')
