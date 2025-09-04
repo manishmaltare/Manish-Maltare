@@ -16,12 +16,6 @@ target = pd.read_csv('Titanic_test.csv')
 
 new_df = pd.concat([new_df, target], ignore_index=True )
 
-new_df['Sex'].value_counts()
-
-new_df['SibSp'].value_counts()
-
-new_df['Cabin'].value_counts()
-
 new_df['Fare']=new_df['Fare'].fillna(new_df['Fare'].mean())
 
 # FEATURE EXTRACTION - i did perform it before EDA- 1 as the feature & target variable are given
