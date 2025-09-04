@@ -137,13 +137,6 @@ fare = st.number_input("Fare", min_value=0, max_value=600, value=30)
 cabin = st.selectbox("Cabin Deck", ["A", "B", "C", "D", "E", "F", "G", "T", "U"])
 embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
-# Encode categorical variables
-
-sex_encoded = sex_lee.fit_transform([sex])
-
-embarked_encoded = emb_lee.fit_transform([embarked])
-
-cabin_encoded = cabin_lee.fit_transform([cabin])
 
 # Create a DataFrame for the input
 input_data = pd.DataFrame({
