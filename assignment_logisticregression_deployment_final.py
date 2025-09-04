@@ -168,7 +168,7 @@ from sklearn.linear_model import LogisticRegression
 
 model=LogisticRegression()
 
-model1.fit(x_train,y_train)
+model1 = model.fit(x_train,y_train)
 
 scaler1 = sc.fit_transform(x_train)
 
