@@ -91,8 +91,8 @@ sc=StandardScaler()
 
 x_train=sc.fit_transform(x_train)
 scaler_model = sc.fit_transform(x_train)
-with open("scaler_model", "rb") as file:
-    scaler_model = pickle.load(file)
+with open("scaler_model.pkl", "wb") as file:
+  pickle.dump(scaler_model, file)
 
 x_test=sc.fit_transform(x_test)
 
