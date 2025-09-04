@@ -90,6 +90,8 @@ from sklearn.preprocessing import StandardScaler
 sc=StandardScaler()
 
 x_train=sc.fit_transform(x_train)
+with open("scaler_model", "rb") as file:
+    scaler_model = pickle.load(file)
 
 x_test=sc.fit_transform(x_test)
 
@@ -120,6 +122,8 @@ with open("sex_le.pkl", "rb") as file2:
     sex_lee = pickle.load(file2)
 with open("cabin_le.pkl", "rb") as file3:
     cabin_lee = pickle.load(file3)
+with open("scaler_model.pkl", "rb") as file4:
+    scaler_model = pickle.load(file4)
 
 # Title of the Streamlit app
 st.title("Titanic Survival Prediction")
@@ -160,7 +164,7 @@ input_data['Embarked'] = emb_lee.transform(input_data['Embarked'])
 numerical_features = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Sex', 'Cabin', 'Embarked']
     
     # 3. Apply the pre-fitted StandardScaler to the numerical features
-scaled_data = scaler.transform(input_data[numerical_features])
+scaled_data = scaler_model.transform(input_data[numerical_features])
     
     # 4. Create a new DataFrame with the scaled data
 scaled_input_data = pd.DataFrame(scaled_data, columns=numerical_features)
