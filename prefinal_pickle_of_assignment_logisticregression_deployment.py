@@ -61,14 +61,18 @@ new_df['Embarked']=emb_le
 new_df['Sex']=sex_le
 new_df['Cabin']=cabin_le
 
+emb_le1=le.fit(new_df['Embarked'])
+sex_le1=le1.fit(new_df['Sex'])
+cabin_le1=le2.fit(new_df['Cabin'])
+
 with open("emb_lee.pkl", "wb") as file:
-  pickle.dump(emb_le, file)
+  pickle.dump(emb_le1, file)
 
 with open("cabin_lee.pkl", "wb") as file:
-  pickle.dump(cabin_le, file)
+  pickle.dump(cabin_le1, file)
 
 with open("sex_lee.pkl", "wb") as file:
-  pickle.dump(sex_le, file)
+  pickle.dump(sex_le1, file)
 
 # removing ticket as its having 76% on unique values as string & integers.
 new_df=new_df.drop(['Ticket'],axis=1)
