@@ -257,15 +257,46 @@ model
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
 
+
+%%writefile app.py
 import streamlit as st
-import pandas as pd
-import joblib
+import pickle
 import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
+import joblib
+from sklearn.utils.validation import check_is_fitted
+
+# Load the trained model and scaler
+logistic_reg_model = LogisticRegression()
+scaler = StandardScaler()
+joblib.dump(scaler, 'scaler.pkl')
+joblib.dump(logistic_reg_model,'logistic_reg_model.pkl')
+
 
 # Load the saved model and scaler
 model = joblib.load('logistic_reg_model.pkl')
 scaler = joblib.load('scaler.pkl')
+
+# Load the trained model and scaler
+try:
+    with open('logistic_reg_model.pkl', 'rb') as file:
+        model = pickle.load(file)
+    with open('scaler.pkl', 'rb') as file:
+        scaler = pickle.load(file)
+    st.success("Model and scaler loaded successfully!")
+except Exception as e:
+    st.error(f"Error loading model or scaler: {e}")
+    st.stop()
+
+# Check if scaler is fitted (to catch the NotFittedError early)
+try:
+    check_is_fitted(scaler)
+except Exception as e:
+    st.error(f"Scaler is not fitted: {e}. Please re-train and save a fitted scaler.")
+    st.stop()
 
 # Title of the Streamlit app
 st.title("Titanic Survival Prediction")
@@ -296,6 +327,7 @@ le_cabin = LabelEncoder()
 le_cabin.fit(["A", "B", "C", "D", "E", "F", "G", "T", "U"])
 cabin_encoded = le_cabin.transform([cabin])[0]
 
+
 # Create a DataFrame for the input
 input_data = pd.DataFrame({
     'Pclass': [pclass],
@@ -309,12 +341,13 @@ input_data = pd.DataFrame({
 })
 
 # Scale the input data
-input_scaled = scaler.transform(input_data)
+input_scaled = scaler.fit_transform(input_data)
+input_scaled1 = pd.DataFrame(input_scaled , columns=['Pclass','Sex','Age','SibSp','Parch','Fare','Cabin','Embarked'])
 
 # Predict button
 if st.button("Predict"):
-    prediction = model.predict(input_scaled)
-    probability = model.predict_proba(input_scaled)[0][1]  # Probability of survival
+    prediction = logistic_reg_model.pkl.predict(input_scaled1)
+    probability = logistic_reg_model.pkl.predict_proba(input_scaled1)[0][1]  # Probability of survival
 
     # Display result
     if prediction[0] == 1:
