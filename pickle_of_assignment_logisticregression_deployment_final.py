@@ -237,10 +237,10 @@ st.write("Enter passenger details to predict survival probability on the Titanic
 # Input fields for features
 pclass = st.selectbox("Passenger Class (Pclass)", [1, 2, 3])
 sex = st.selectbox("Sex", ["male", "female"])
-age = st.number_input("Age", min_value=0.0, max_value=100.0, value=30.0)
+age = st.number_input("Age", min_value=0, max_value=100, value=30)
 sibsp = st.number_input("Number of Siblings/Spouses Aboard (SibSp)", min_value=0, max_value=10, value=0)
 parch = st.number_input("Number of Parents/Children Aboard (Parch)", min_value=0, max_value=10, value=0)
-fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=30.0)
+fare = st.number_input("Fare", min_value=0, max_value=600, value=30)
 cabin = st.selectbox("Cabin Deck", ["A", "B", "C", "D", "E", "F", "G", "T", "U"])
 embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
