@@ -262,48 +262,68 @@ import pandas as pd
 import joblib
 import numpy as np
 
+import streamlit as st
+import pandas as pd
+import joblib
+from sklearn.preprocessing import LabelEncoder
+
 # Load the saved model and scaler
 model = joblib.load('logistic_reg_model.pkl')
 scaler = joblib.load('scaler.pkl')
 
-# Dictionaries for encoding categorical variables
-SEX_MAPPING = {'Female': 0, 'Male': 1}
-EMBARKED_MAPPING = {'S': 2, 'C': 0, 'Q': 1}
-CABIN_MAPPING = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
+# Title of the Streamlit app
+st.title("Titanic Survival Prediction")
 
-st.title("Titanic Survival Prediction App")
-st.write("Enter the passenger details to predict survival probability:")
+# Description
+st.write("Enter passenger details to predict survival probability on the Titanic.")
 
-# Sidebar for user input
-pclass = st.selectbox("Passenger Class (1 = 1st, 2 = 2nd, 3 = 3rd)", [1, 2, 3])
-sex = st.selectbox("Sex", ["Female", "Male"])
-age = st.number_input("Age", min_value=0, max_value=100, value=30)
-sibsp = st.number_input("Number of Siblings/Spouses aboard", min_value=0, max_value=10, value=0)
-parch = st.number_input("Number of Parents/Children aboard", min_value=0, max_value=10, value=0)
-fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=32.0)
-cabin = st.selectbox("Cabin Deck", ["U","C","B","D","E","A","F","G","T"])
-embarked = st.selectbox("Port of Embarkation", ["S", "C", "Q"])
+# Input fields for features
+pclass = st.selectbox("Passenger Class (Pclass)", [1, 2, 3])
+sex = st.selectbox("Sex", ["male", "female"])
+age = st.number_input("Age", min_value=0.0, max_value=100.0, value=30.0)
+sibsp = st.number_input("Number of Siblings/Spouses Aboard (SibSp)", min_value=0, max_value=10, value=0)
+parch = st.number_input("Number of Parents/Children Aboard (Parch)", min_value=0, max_value=10, value=0)
+fare = st.number_input("Fare", min_value=0.0, max_value=600.0, value=30.0)
+cabin = st.selectbox("Cabin Deck", ["A", "B", "C", "D", "E", "F", "G", "T", "U"])
+embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
-# Mapping the inputs
-sex_encoded = SEX_MAPPING[sex]
-embarked_encoded = EMBARKED_MAPPING[embarked]
-cabin_encoded = CABIN_MAPPING[cabin]
+# Encode categorical variables
+le_sex = LabelEncoder()
+le_sex.fit(["male", "female"])
+sex_encoded = le_sex.transform([sex])[0]
 
-# Create dataframe for model input
-input_df = pd.DataFrame([[pclass, sex_encoded, age, sibsp, parch, fare, cabin_encoded, embarked_encoded]],
-                        columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked'])
+le_embarked = LabelEncoder()
+le_embarked.fit(["C", "Q", "S"])
+embarked_encoded = le_embarked.transform([embarked])[0]
 
-# Scale the inputs
-input_scaled = scaler.transform(input_df)
+le_cabin = LabelEncoder()
+le_cabin.fit(["A", "B", "C", "D", "E", "F", "G", "T", "U"])
+cabin_encoded = le_cabin.transform([cabin])[0]
+
+# Create a DataFrame for the input
+input_data = pd.DataFrame({
+    'Pclass': [pclass],
+    'Sex': [sex_encoded],
+    'Age': [age],
+    'SibSp': [sibsp],
+    'Parch': [parch],
+    'Fare': [fare],
+    'Cabin': [cabin_encoded],
+    'Embarked': [embarked_encoded]
+})
+
+# Scale the input data
+input_scaled = scaler.transform(input_data)
 
 # Predict button
-if st.button("Predict Survival"):
+if st.button("Predict"):
     prediction = model.predict(input_scaled)
     probability = model.predict_proba(input_scaled)[0][1]  # Probability of survival
-    
+
+    # Display result
     if prediction[0] == 1:
-        st.success(f"The passenger is likely to SURVIVE with a probability of {probability:.2f}")
+        st.success(f"The passenger is likely to **survive** with a probability of {probability:.2f}.")
     else:
-        st.error(f"The passenger is likely NOT to SURVIVE with a probability of {1 - probability:.2f}")
+        st.error(f"The passenger is likely to **not survive** with a probability of {1 - probability:.2f}.")
 
 
