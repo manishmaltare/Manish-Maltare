@@ -271,7 +271,7 @@ input_data = pd.DataFrame({
 })
 
 input_data_scaled = StandardScaler()
-input_data_scaled1=input_data_scaled.fit_transform(input_data).reshape(-1,1)
+input_data_scaled1=input_data_scaled.fit_transform(input_data)
 
 # Predict button
 if st.button("Predict"):
