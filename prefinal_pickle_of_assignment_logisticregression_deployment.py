@@ -65,9 +65,6 @@ new_df['Embarked']=emb_le
 new_df['Sex']=sex_le
 new_df['Cabin']=cabin_le
 
-with open("logistic_regression_model.pkl", "wb") as file:
-  pickle.dump(model1, file)
-
 with open("emb_le.pkl", "wb") as file:
   pickle.dump(emb_le, file)
 
