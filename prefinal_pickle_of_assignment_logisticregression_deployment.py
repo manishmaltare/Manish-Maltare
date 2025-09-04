@@ -141,13 +141,13 @@ embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 # Create a DataFrame for the input
 input_data = pd.DataFrame({
     'Pclass': [pclass],
-    'Sex': [sex_encoded],
+    'Sex': [sex],
     'Age': [age],
     'SibSp': [sibsp],
     'Parch': [parch],
     'Fare': [fare],
-    'Cabin': [cabin_encoded],
-    'Embarked': [embarked_encoded]
+    'Cabin': [cabin],
+    'Embarked': [embarked]
 })
 
 input_data_scaled = StandardScaler()
