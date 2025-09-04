@@ -270,10 +270,13 @@ input_data = pd.DataFrame({
     'Embarked': [embarked_encoded]
 })
 
+input_data_scaled = StandardScaler()
+input_data_scaled.fit_transform(input_data)
+
 # Predict button
 if st.button("Predict"):
-    prediction = model.predict(input_data)
-    probability = model.predict_proba(input_data)[0][1]  # Probability of survival
+    prediction = model.predict(input_data_scaled)
+    probability = model.predict_proba(input_data_scaled)[0][1]  # Probability of survival
 
     # Display result
     if prediction[0] == 1:
