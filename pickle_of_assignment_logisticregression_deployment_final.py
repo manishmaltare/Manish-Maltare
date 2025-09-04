@@ -9,6 +9,7 @@ Original file is located at
 
 import pandas as pd # LOAD DATASET
 import joblib
+import pickle
 
 features = pd.read_csv('Titanic_train.csv')
 
@@ -54,6 +55,7 @@ le = LabelEncoder()
 features['Embarked']=le.fit_transform(features['Embarked'])
 
 features['Sex']=le.fit_transform(features['Sex'])
+
 
 # removing ticket as its having 76% on unique values as string & integers.
 features=features.drop(['Ticket'],axis=1)
@@ -109,8 +111,6 @@ from sklearn.linear_model import LogisticRegression
 model=LogisticRegression()
 
 model1 = model.fit(x_train,y_train)
-
-import pickle
 
 with open("logistic_regression_model.pkl", "wb") as file:
   pickle.dump(model1, file)
