@@ -139,22 +139,21 @@ input_data = {
     'Cabin': cabin,
     'Embarked': embarked
 }
-
-#  Manual Standard Scaling
-scaled_input = {}
-for feature in input_data:
-    mean = training_means[feature]
-    std = training_stds[feature]
-    scaled_value = (input_data[feature] - mean) / std
-    scaled_input[feature] = scaled_value
+if st.button("Predict"):
+    #  Manual Standard Scaling
+    scaled_input = {}
+    for feature in input_data:
+        mean = training_means[feature]
+        std = training_stds[feature]
+        scaled_value = (input_data[feature] - mean) / std
+        scaled_input[feature] = scaled_value
 
 # Convert to DataFrame (shape: [1, 8])
 scaled_df = pd.DataFrame([scaled_input])
 
 #  Predict
-if st.button("Predict"):
-    prediction = model.predict(scaled_df)
-    prob = model.predict_proba(scaled_df)[0][1]
+prediction = model.predict(scaled_df)
+prob = model.predict_proba(scaled_df)[0][1]
 
 #  Output
 if prediction[0] == 1:
