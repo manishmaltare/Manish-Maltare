@@ -51,9 +51,11 @@ new_df=new_df.drop(['PassengerId','Name'],axis=1)
 # DATA PREPROCESSING : - "Encode categorical data"
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
+le1 = LabelEncoder()
+le2 = LabelEncoder()
 emb_le=le.fit_transform(new_df['Embarked'])
-sex_le=le.fit_transform(new_df['Sex'])
-cabin_le=le.fit_transform(new_df['Cabin'])
+sex_le=le1.fit_transform(new_df['Sex'])
+cabin_le=le2.fit_transform(new_df['Cabin'])
 
 new_df['Embarked']=emb_le
 new_df['Sex']=sex_le
