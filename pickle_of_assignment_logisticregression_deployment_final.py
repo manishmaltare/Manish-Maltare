@@ -35,8 +35,6 @@ features['Embarked']=features['Embarked'].fillna(features['Embarked'].mode()[0])
 
 features['Cabin']=features['Cabin'].str[0]
 
-features['Cabin']
-
 features['Cabin']=features['Cabin'].fillna('U')
 
 # I drop the columns PassengerID & Name.
