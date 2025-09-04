@@ -223,6 +223,7 @@ import pandas as pd
 import streamlit as st
 import pickle
 import numpy as np
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 # Load the trained model
 with open("logistic_regression_model.pkl", "rb") as file:
@@ -268,7 +269,6 @@ input_data = pd.DataFrame({
     'Cabin': [cabin_encoded],
     'Embarked': [embarked_encoded]
 })
-
 
 # Predict button
 if st.button("Predict"):
