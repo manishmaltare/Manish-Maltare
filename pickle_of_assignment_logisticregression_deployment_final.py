@@ -272,6 +272,7 @@ input_data = pd.DataFrame({
 
 input_data_scaled = StandardScaler()
 input_data_scaled1=input_data_scaled.fit_transform(input_data)
+input_data_scaled2 = pd.DataFrame(input_data_scaled1, columns=['Pclass','Sex','Age','SibSp','Parch','Fare','Cabin','Embarked'])
 
 # Predict button
 if st.button("Predict"):
