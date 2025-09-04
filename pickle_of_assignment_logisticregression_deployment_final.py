@@ -17,20 +17,6 @@ target = pd.read_csv('Titanic_test.csv')
 # FEATURE EXTRACTION - i did perform it before EDA- 1 as the feature & target variable are given
 # separately.
 
-features.shape
-
-target.shape
-
-features.isnull().sum()
-
-features
-
-features.shape
-
-features.info()
-
-features.describe()
-
 # DATA PREPROCESSING : - "Imputation"
 # Imputation i am using here to fill the blank rows, keeping rows empty can lead to
 # model not run.
@@ -38,18 +24,10 @@ features.describe()
 
 features['Age']=features['Age'].fillna(features['Age'].mean())
 
-features.isnull().sum()
-
-features['Embarked'].value_counts()
-
 # i am using imputation by applying most frequent rows into the blank ones in
 # Embarked, as its having only 2-rows empty.
 
 features['Embarked']=features['Embarked'].fillna(features['Embarked'].mode()[0])
-
-features.isnull().sum()
-
-features['Embarked'].value_counts()
 
 # i am using imputation here, by first separating first letter of Cabin,
 # beacause, it is deck no. which i feel is the only useful for process.
@@ -61,14 +39,6 @@ features['Cabin']
 
 features['Cabin']=features['Cabin'].fillna('U')
 
-features['Cabin'].value_counts()
-
-features.isnull().sum()
-
-features.columns
-
-features.nunique()
-
 # I drop the columns PassengerID & Name.
 # Main reason : - having data value in all rows unique, Regression will not work.
 # PassengerID is just serial no. as per the registration. and in +1 incerasing order.
@@ -77,88 +47,36 @@ features.nunique()
 
 features=features.drop(['PassengerId','Name'],axis=1)
 
-features.head()
-
 # DATA PREPROCESSING : - "Encode categorical data"
 
 from sklearn.preprocessing import LabelEncoder
 
 le = LabelEncoder()
 
-features.head()
-
-features.value_counts()
-
-features['Sex'].value_counts()
-
 features['Embarked']=le.fit_transform(features['Embarked'])
 
-features['Embarked'].value_counts()
-
 features['Sex']=le.fit_transform(features['Sex'])
-
-features['Sex'].value_counts()
-
-features.head()
-
-features.nunique()
 
 # removing ticket as its having 76% on unique values as string & integers.
 features=features.drop(['Ticket'],axis=1)
 
 features['Cabin']=le.fit_transform(features['Cabin'])
 
-features['Cabin'].value_counts()
-
-features.head()
-
-target.head()
-
-target.shape
-
-target.nunique()
-
-target.columns
-
 target=target.drop(['PassengerId','Name','Ticket'],axis=1)
-
-target.head()
-
-target.isnull().sum()
 
 # Repeating the same steps of Data preprocessing for 'target' varable to prepare the dataset for prediction.
 
 target['Age']=target['Age'].fillna(target['Age'].mean())
 
-target['Age'].value_counts()
-
-target.isnull().sum()
-
 target['Cabin']=target['Cabin'].str[0]
 
-target.head()
-
 target['Cabin']=target['Cabin'].fillna('U')
-
-target['Cabin'].value_counts()
-
-target.head()
 
 # merging 'features' & 'target' variables to perform EDA.
 # EDA-1
 
 data_merged=pd.concat([features,target],ignore_index=True)
-data_merged.head()
 
-data_merged.columns
-
-data_merged.shape
-
-data_merged.size
-
-data_merged.info()
-
-data_merged.describe()
 # Age , the average is 29.88 years. Max is 88 years old.
 # Fare, Max. fare price is 512, avg is 33.29 units.
 # Pclass, mean is 2.29 indicates that most people are of middle income group (2nd class).
@@ -170,15 +88,8 @@ target['Embarked']=le.fit_transform(target['Embarked'])
 
 target['Cabin']=le.fit_transform(target['Cabin'])
 
-target.head()
-
 x = features.drop(['Survived'],axis=1)
-x.head()
-
-x.columns
-
 y= features['Survived']
-y.head()
 
 # EDA-2 (MODEL BUILDING)
 from sklearn.model_selection import train_test_split
@@ -188,11 +99,6 @@ x_train,x_test,y_train,y_test=train_test_split(x,y,random_state=42,train_size=0.
 x_train.shape,x_test.shape,y_train.shape,y_test.shape
 
 column_names=x_train.columns
-column_names
-
-x_train.head()
-
-x_train.isnull().sum()
 
 from sklearn.preprocessing import StandardScaler
 
