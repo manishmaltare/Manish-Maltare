@@ -77,12 +77,11 @@ import streamlit as st
 import pickle
 import pandas as pd
 
-# Load trained model
+# Load your trained model
 with open("logistic_regression_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# 🚨 Manually define training means and stds (must match training data)
-# These are EXAMPLES – replace with actual values from your training data
+# Manual training means and stds
 training_means = {
     'Pclass': 2.308642,
     'Sex': 0.647587,
@@ -105,15 +104,15 @@ training_stds = {
     'Embarked': 0.791503
 }
 
-# Label encodings (your mappings)
+# Label encodings
 sex_label = {'male': 1, 'female': 0}
 embarked_label = {'S': 2, 'C': 0, 'Q': 1}
 cabin_label = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
 
-# UI inputs
-st.title("Titanic Survival Prediction (Manual Scaling)")
-st.write("Enter passenger details:")
+# Title
+st.title("🚢 Titanic Survival Prediction (Manual Scaling)")
 
+# Inputs
 pclass = st.selectbox("Passenger Class (Pclass)", [1, 2, 3])
 sex_str = st.selectbox("Sex", list(sex_label.keys()))
 age = st.number_input("Age", min_value=0, max_value=100, value=30)
@@ -123,40 +122,40 @@ fare = st.number_input("Fare", min_value=0, max_value=600, value=30)
 cabin_str = st.selectbox("Cabin Deck", list(cabin_label.keys()))
 embarked_str = st.selectbox("Port of Embarkation", list(embarked_label.keys()))
 
-# Encode input
-sex = sex_label[sex_str]
-cabin = cabin_label[cabin_str]
-embarked = embarked_label[embarked_str]
-
-# Create raw input data
-input_data = {
-    'Pclass': pclass,
-    'Sex': sex,
-    'Age': age,
-    'SibSp': sibsp,
-    'Parch': parch,
-    'Fare': fare,
-    'Cabin': cabin,
-    'Embarked': embarked
-}
+# Predict button
 if st.button("Predict"):
-    #  Manual Standard Scaling
-    scaled_input = {}
-    for feature in input_data:
-        mean = training_means[feature]
-        std = training_stds[feature]
-        scaled_value = (input_data[feature] - mean) / std
-        scaled_input[feature] = scaled_value
+    # Encode inputs
+    sex = sex_label[sex_str]
+    cabin = cabin_label[cabin_str]
+    embarked = embarked_label[embarked_str]
 
-# Convert to DataFrame (shape: [1, 8])
-scaled_df = pd.DataFrame([scaled_input])
+    # Raw input
+    input_data = {
+        'Pclass': pclass,
+        'Sex': sex,
+        'Age': age,
+        'SibSp': sibsp,
+        'Parch': parch,
+        'Fare': fare,
+        'Cabin': cabin,
+        'Embarked': embarked
+    }
 
-#  Predict
-prediction = model.predict(scaled_df)
-prob = model.predict_proba(scaled_df)[0][1]
+    # Manual standard scaling
+    scaled_input = {
+        feature: (input_data[feature] - training_means[feature]) / training_stds[feature]
+        for feature in input_data
+    }
 
-#  Output
-if prediction[0] == 1:
-    st.success(f" The passenger is likely to **survive** with a probability of `{prob:.2f}`.")
-else:
-    st.error(f" The passenger is likely to **not survive** with a probability of `{1 - prob:.2f}`.")
+    # Create DataFrame
+    scaled_df = pd.DataFrame([scaled_input])
+
+    # Predict
+    prediction = model.predict(scaled_df)
+    prob = model.predict_proba(scaled_df)[0][1]
+
+    # Output
+    if prediction[0] == 1:
+        st.success(f"✅ The passenger is likely to **survive** with a probability of `{prob:.2f}`.")
+    else:
+        st.error(f"❌ The passenger is likely to **not survive** with a probability of `{1 - prob:.2f}`.")
