@@ -114,7 +114,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.model_selection import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 
 # Load the trained model
 with open("logistic_regression_model.pkl", "rb") as file:
