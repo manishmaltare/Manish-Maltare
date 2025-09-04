@@ -103,15 +103,11 @@ model1 = model.fit(x_train,y_train)
 with open("logistic_regression_model.pkl", "wb") as file:
   pickle.dump(model1, file)
 
-import numpy as np
-import pandas as pd
-
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
 
 import streamlit as st
 import pickle
-import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
