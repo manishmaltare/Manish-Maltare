@@ -138,14 +138,11 @@ cabin = st.selectbox("Cabin Deck", ["A", "B", "C", "D", "E", "F", "G", "T", "U"]
 embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
 # Encode categorical variables
-sex_lee.fit(["male", "female"])
+
 sex_encoded = sex_lee.transform([sex])[0]
 
-emb_lee.fit(["C", "Q", "S"])
 embarked_encoded = emb_lee.transform([embarked])[0]
 
-
-cabin_lee.fit(["A", "B", "C", "D", "E", "F", "G", "T", "U"])
 cabin_encoded = cabin_lee.transform([cabin])[0]
 
 # Create a DataFrame for the input
