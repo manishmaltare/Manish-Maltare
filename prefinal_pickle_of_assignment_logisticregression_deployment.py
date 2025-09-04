@@ -139,7 +139,7 @@ embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
 
 # Encode categorical variables
 sex_lee.fit(["male", "female"])
-sex_encoded = le_sex.transform([sex])[0]
+sex_encoded = sex_lee.transform([sex])[0]
 
 emb_lee.fit(["C", "Q", "S"])
 embarked_encoded = emb_lee.transform([embarked])[0]
