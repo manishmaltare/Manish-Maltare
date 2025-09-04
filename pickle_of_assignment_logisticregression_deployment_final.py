@@ -9,7 +9,6 @@ Original file is located at
 
 import pandas as pd # LOAD DATASET
 import joblib
-! pip install streamlit
 
 features = pd.read_csv('/content/Titanic_train.csv')
 
@@ -240,8 +239,6 @@ import pickle
 
 with open("logistic_regression_model.pkl", "wb") as file:
   pickle.dump(model1, file)
-
-pip install streamlit
 
 import numpy as np
 
