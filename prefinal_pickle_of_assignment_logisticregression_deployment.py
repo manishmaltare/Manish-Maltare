@@ -156,7 +156,7 @@ input_data = pd.DataFrame({
 
 
     # 1. Label encode the categorical variables first
-input_data['Sex'] = sex_lee.transform(input_data['Sex'])
+
 input_data['Cabin'] = cabin_lee.transform(input_data['Cabin'])
 input_data['Embarked'] = emb_lee.transform(input_data['Embarked'])
 
