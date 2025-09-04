@@ -47,17 +47,6 @@ new_df['Cabin']=new_df['Cabin'].fillna('U')
 
 new_df=new_df.drop(['PassengerId','Name'],axis=1)
 
-print(new_df['Embarked'].value_counts())
-print(new_df['Sex'].value_counts())
-print(new_df['Cabin'].value_counts())
-
-# This cell is no longer needed after incorporating the encoding in the previous cell.
-# Removing this cell to avoid confusion and potential errors.
-
-print(new_df['Embarked'].value_counts())
-print(new_df['Sex'].value_counts())
-print(new_df['Cabin'].value_counts())
-
 sex_label = {'male': 1, 'female': 0}
 embarked_label = {'S': 2, 'C': 0, 'Q': 1}
 cabin_label = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
@@ -76,13 +65,7 @@ y_train = y.iloc[0:891]
 x_train = x.iloc[0:891]
 x_test = x.iloc[892:1309]
 
-x_train.mean()
-
-x_train.std()
-
 x_train_scaled = (x_train - x_train.mean())/ x_train.std()
-
-x_train_scaled
 
 from sklearn.linear_model import LogisticRegression
 model=LogisticRegression()
@@ -129,7 +112,7 @@ embarked_label = {'S': 2, 'C': 0, 'Q': 1}
 cabin_label = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
 
 # UI inputs
-st.title("🚢 Titanic Survival Prediction (Manual Scaling)")
+st.title("Titanic Survival Prediction (Manual Scaling)")
 st.write("Enter passenger details:")
 
 pclass = st.selectbox("Passenger Class (Pclass)", [1, 2, 3])
@@ -158,7 +141,7 @@ input_data = {
     'Embarked': embarked
 }
 
-# ✅ Manual Standard Scaling
+#  Manual Standard Scaling
 scaled_input = {}
 for feature in input_data:
     mean = training_means[feature]
@@ -169,12 +152,12 @@ for feature in input_data:
 # Convert to DataFrame (shape: [1, 8])
 scaled_df = pd.DataFrame([scaled_input])
 
-# 🔮 Predict
+#  Predict
 prediction = model.predict(scaled_df)
 prob = model.predict_proba(scaled_df)[0][1]
 
-# 📢 Output
+#  Output
 if prediction[0] == 1:
-    st.success(f"✅ The passenger is likely to **survive** with a probability of `{prob:.2f}`.")
+    st.success(f" The passenger is likely to **survive** with a probability of `{prob:.2f}`.")
 else:
-    st.error(f"❌ The passenger is likely to **not survive** with a probability of `{1 - prob:.2f}`.")
+    st.error(f" The passenger is likely to **not survive** with a probability of `{1 - prob:.2f}`.")
