@@ -325,11 +325,3 @@ if st.button("Predict"):
         st.success(f"The passenger is likely to **survive** with a probability of {probability:.2f}.")
     else:
         st.error(f"The passenger is likely to **not survive** with a probability of {1 - probability:.2f}.")
-
-! wget -q -o - ipv4.canhanzip.com
- # canhapzip allows us to build domain into scripts to automatically determine
- # what is your public IP address from any system of the earth.
-
-! streamlit run app.py & npx localtunnel --port 8501
-# local tunnel allows us to easily web service on your local network
-# machine
