@@ -65,13 +65,13 @@ new_df['Embarked']=emb_le
 new_df['Sex']=sex_le
 new_df['Cabin']=cabin_le
 
-with open("emb_le.pkl", "wb") as file:
+with open("emb_lee.pkl", "wb") as file:
   pickle.dump(emb_le, file)
 
-with open("cabin_le.pkl", "wb") as file:
+with open("cabin_lee.pkl", "wb") as file:
   pickle.dump(cabin_le, file)
 
-with open("sex_le.pkl", "wb") as file:
+with open("sex_lee.pkl", "wb") as file:
   pickle.dump(sex_le, file)
 
 # removing ticket as its having 76% on unique values as string & integers.
@@ -119,11 +119,11 @@ from sklearn.linear_model import LogisticRegression
 # Load the trained model
 with open("logistic_regression_model.pkl", "rb") as file:
     model = pickle.load(file)
-with open("emb_le.pkl", "rb") as file1:
+with open("emb_lee.pkl", "rb") as file1:
     emb_lee = pickle.load(file1)
-with open("sex_le.pkl", "rb") as file2:
+with open("sex_lee.pkl", "rb") as file2:
     sex_lee = pickle.load(file2)
-with open("cabin_le.pkl", "rb") as file3:
+with open("cabin_lee.pkl", "rb") as file3:
     cabin_lee = pickle.load(file3)
 with open("scaler_model.pkl", "rb") as file4:
     scaler_model = pickle.load(file4)
