@@ -113,16 +113,17 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 
 # Load the trained model
-with open("logistic_regression_model.pkl", "rb") as file:
-    model = pickle.load(file)
-with open("emb_lee.pkl", "rb") as file:
-    emb_lee = pickle.load(file)
+
 with open("sex_lee.pkl", "rb") as file:
     sex_lee = pickle.load(file)
 with open("cabin_lee.pkl", "rb") as file:
     cabin_lee = pickle.load(file)
+with open("emb_lee.pkl", "rb") as file:
+    emb_lee = pickle.load(file)
 with open("scaler_model.pkl", "rb") as file:
     scaler_model = pickle.load(file)
+with open("logistic_regression_model.pkl", "rb") as file:
+    model = pickle.load(file)
 
 # Title of the Streamlit app
 st.title("Titanic Survival Prediction")
