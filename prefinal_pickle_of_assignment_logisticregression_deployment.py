@@ -150,6 +150,11 @@ input_data = pd.DataFrame({
     'Embarked': [embarked]
 })
 
+     # 1. Label encode the categorical variables
+input_data['Sex'] = sex_lee.transform(input_data['Sex'])
+input_data['Cabin'] = cabin_lee.transform(input_data['Cabin'])
+input_data['Embarked'] = emb_lee.transform(input_data['Embarked'])
+
 input_data_scaled = StandardScaler()
 input_data_scaled1=input_data_scaled.fit_transform(input_data)
 input_data_scaled2 = pd.DataFrame(input_data_scaled1, columns=['Pclass','Sex','Age','SibSp','Parch','Fare','Cabin','Embarked'])
