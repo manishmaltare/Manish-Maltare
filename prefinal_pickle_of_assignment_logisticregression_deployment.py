@@ -150,22 +150,27 @@ input_data = pd.DataFrame({
     'Embarked': [embarked]
 })
 
-     # 1. Label encode the categorical variables
+
+    # 1. Label encode the categorical variables first
 input_data['Sex'] = sex_lee.transform(input_data['Sex'])
 input_data['Cabin'] = cabin_lee.transform(input_data['Cabin'])
 input_data['Embarked'] = emb_lee.transform(input_data['Embarked'])
 
-input_data_scaled = StandardScaler()
-input_data_scaled1=input_data_scaled.fit_transform(input_data)
-input_data_scaled2 = pd.DataFrame(input_data_scaled1, columns=['Pclass','Sex','Age','SibSp','Parch','Fare','Cabin','Embarked'])
+    # 2. Separate numerical and categorical features for scaling
+numerical_features = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Sex', 'Cabin', 'Embarked']
+    
+    # 3. Apply the pre-fitted StandardScaler to the numerical features
+scaled_data = scaler.transform(input_data[numerical_features])
+    
+    # 4. Create a new DataFrame with the scaled data
+scaled_input_data = pd.DataFrame(scaled_data, columns=numerical_features)
+    
+    # 5. Make the prediction using the preprocessed data
+prediction = model.predict(scaled_input_data)
+probability = model.predict_proba(scaled_input_data)[0][1]  # Probability of survival
 
-# Predict button
-if st.button("Predict"):
-    prediction = model.predict(input_data_scaled1)
-    probability = model.predict_proba(input_data_scaled1)[0][1]  # Probability of survival
-
-    # Display result
-    if prediction[0] == 1:
-        st.success(f"The passenger is likely to **survive** with a probability of {probability:.2f}.")
-    else:
-        st.error(f"The passenger is likely to **not survive** with a probability of {1 - probability:.2f}.")
+    # Display the result
+if prediction[0] == 1:
+    st.success(f"The passenger is likely to **survive** with a probability of {probability:.2f}.")
+else:
+    st.error(f"The passenger is likely to **not survive** with a probability of {1 - probability:.2f}.")
