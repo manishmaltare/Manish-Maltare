@@ -110,7 +110,7 @@ embarked_label = {'S': 2, 'C': 0, 'Q': 1}
 cabin_label = {'U': 8, 'C': 2, 'B': 1, 'D': 3, 'E': 4, 'A': 0, 'F': 5, 'G': 6, 'T': 7}
 
 # Title
-st.title("🚢 Titanic Survival Prediction (Manual Scaling)")
+st.title("Titanic Survival Prediction")
 
 # Inputs
 pclass = st.selectbox("Passenger Class (Pclass)", [1, 2, 3])
