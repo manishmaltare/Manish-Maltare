@@ -159,15 +159,15 @@ input_data = pd.DataFrame({
 
 
     # 1. Label encode the categorical variables first
-input_data['Sex'] = sex_lee.fit_transform(input_data['Sex'])
-input_data['Cabin'] = cabin_lee.fit_transform(input_data['Cabin'])
-input_data['Embarked'] = emb_lee.fit_transform(input_data['Embarked'])
+input_data['Sex'] = sex_lee.transform(input_data['Sex'])
+input_data['Cabin'] = cabin_lee.transform(input_data['Cabin'])
+input_data['Embarked'] = emb_lee.transform(input_data['Embarked'])
 
     # 2. Separate numerical and categorical features for scaling
 numerical_features = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Sex', 'Cabin', 'Embarked']
     
     # 3. Apply the pre-fitted StandardScaler to the numerical features
-scaled_data = scaler_model.fit_transform(input_data[numerical_features])
+scaled_data = scaler_model.transform(input_data[numerical_features])
     
     # 4. Create a new DataFrame with the scaled data
 scaled_input_data = pd.DataFrame(scaled_data, columns=numerical_features)
