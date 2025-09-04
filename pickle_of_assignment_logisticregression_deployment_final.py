@@ -228,21 +228,6 @@ import numpy as np
 with open("logistic_regression_model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# Title
-st.title("Logistic Regression Prediction App")
-
-# Input fields
-age = st.number_input("Enter Age", min_value=18, max_value=100, step=1)
-balance = st.number_input("Enter Account Balance", min_value=-5000, max_value=100000, step=100)
-duration = st.number_input("Enter Call Duration", min_value=0, max_value=5000, step=1)
-
-# Prediction button
-if st.button("Predict"):
-    features = np.array([[age, balance, duration]])
-    prediction = model.predict(features)
-    result = "Subscribed" if prediction[0] == 1 else "Not Subscribed"
-    st.write(f"Prediction: **{result}**")
-
 # Title of the Streamlit app
 st.title("Titanic Survival Prediction")
 
