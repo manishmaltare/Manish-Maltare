@@ -152,8 +152,9 @@ for feature in input_data:
 scaled_df = pd.DataFrame([scaled_input])
 
 #  Predict
-prediction = model.predict(scaled_df)
-prob = model.predict_proba(scaled_df)[0][1]
+if st.button("Predict"):
+    prediction = model.predict(scaled_df)
+    prob = model.predict_proba(scaled_df)[0][1]
 
 #  Output
 if prediction[0] == 1:
