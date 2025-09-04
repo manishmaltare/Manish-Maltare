@@ -168,7 +168,7 @@ from sklearn.linear_model import LogisticRegression
 
 model=LogisticRegression()
 
-model.fit(x_train,y_train)
+model1.fit(x_train,y_train)
 
 scaler1 = sc.fit_transform(x_train)
 
@@ -179,7 +179,7 @@ joblib.dump(model,'logistic_reg_model.pkl') # Creating a PKL file for deployment
 
 joblib.dump(scaler,'scaler.pkl')
 
-y_pred=model.predict(x_train)
+y_pred=model1.predict(x_train)
 
 # MODEL EVALUATION
 from sklearn.metrics import confusion_matrix
@@ -261,10 +261,6 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-
-import streamlit as st
-import pandas as pd
-import joblib
 from sklearn.preprocessing import LabelEncoder
 
 # Load the saved model and scaler
