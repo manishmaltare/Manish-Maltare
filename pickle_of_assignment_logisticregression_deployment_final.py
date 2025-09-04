@@ -270,7 +270,7 @@ input_data = pd.DataFrame({
     'Embarked': [embarked_encoded]
 })
 
-input_data_scaled = StandardScaler()
+input_data_scaled = StandardScaler().reshape(-1,1)
 input_data_scaled.fit_transform(input_data)
 
 # Predict button
