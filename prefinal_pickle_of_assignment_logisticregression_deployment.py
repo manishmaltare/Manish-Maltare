@@ -115,14 +115,14 @@ from sklearn.linear_model import LogisticRegression
 # Load the trained model
 with open("logistic_regression_model.pkl", "rb") as file:
     model = pickle.load(file)
-with open("emb_lee.pkl", "rb") as file1:
-    emb_lee = pickle.load(file1)
-with open("sex_lee.pkl", "rb") as file2:
-    sex_lee = pickle.load(file2)
-with open("cabin_lee.pkl", "rb") as file3:
-    cabin_lee = pickle.load(file3)
-with open("scaler_model.pkl", "rb") as file4:
-    scaler_model = pickle.load(file4)
+with open("emb_lee.pkl", "rb") as file:
+    emb_lee = pickle.load(file)
+with open("sex_lee.pkl", "rb") as file:
+    sex_lee = pickle.load(file)
+with open("cabin_lee.pkl", "rb") as file:
+    cabin_lee = pickle.load(file)
+with open("scaler_model.pkl", "rb") as file:
+    scaler_model = pickle.load(file)
 
 # Title of the Streamlit app
 st.title("Titanic Survival Prediction")
