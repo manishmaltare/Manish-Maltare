@@ -90,6 +90,7 @@ from sklearn.preprocessing import StandardScaler
 sc=StandardScaler()
 
 x_train=sc.fit_transform(x_train)
+scaler_model = sc.fit_transform(x_train)
 with open("scaler_model", "rb") as file:
     scaler_model = pickle.load(file)
 
