@@ -474,6 +474,7 @@ Add the necessary Streamlit code to the `app.py` file, including input fields an
 # 
 # # Prediction button
 # if st.button('Predict Sentiment'):
+
 #     # This block will contain the prediction logic in the next step
 #     pass
 
@@ -492,11 +493,7 @@ Create a pandas DataFrame from the user inputs, map the rating, clean the text c
 """
 
 # Create DataFrame from inputs
- input_df=pd.DataFrame({
-        'title': [title_input],
-        'body': [body_input],
-        'rating': [rating_input]
-    })
+ input_df=pd.DataFrame({'title': [title_input],'body': [body_input],'rating': [rating_input]})
 
     # Map rating back to categorical
     rating_map_inv = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e'}
