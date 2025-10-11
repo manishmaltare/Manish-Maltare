@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """SVC - Sentiment Analysis - Group 1.ipynb
 
@@ -132,7 +133,6 @@ df_new_2['body_text_length'] = df_new_2['body'].apply(lambda x: len(str(x).split
 """### Conversion of text data into vectors for Model Building"""
 
 # Install vaderSentiment if not already installed
-!pip install vaderSentiment
 
 # Import the SentimentIntensityAnalyzer from the vaderSentiment library
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
