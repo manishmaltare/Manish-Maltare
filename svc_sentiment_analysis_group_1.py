@@ -492,7 +492,7 @@ Create a pandas DataFrame from the user inputs, map the rating, clean the text c
 """
 
 # Create DataFrame from inputs
-    input_df=pd.DataFrame({
+ input_df=pd.DataFrame({
         'title': [title_input],
         'body': [body_input],
         'rating': [rating_input]
