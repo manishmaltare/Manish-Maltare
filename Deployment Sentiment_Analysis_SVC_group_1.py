@@ -346,8 +346,9 @@ from sklearn.model_selection import train_test_split
 # Assuming you already have x_train_vectorized and y_train
 
 # Train the model (as you've already done)
-sv_train = SVC(kernel='linear', gamma='scale', degree=2, C=4.6415888336127775)
+sv_train = SVC(kernel='linear', gamma='scale', degree=2, C=4.6415888336127775, probability=True)
 model_train_tuned = sv_train.fit(x_train_vectorized, y_train)
+
 
 
 import pickle
@@ -388,12 +389,12 @@ def compute_tfidf(text_list, vocab, idf):
         tfidf_matrix.append(doc_vector)
     return np.array(tfidf_matrix)
 
-def predict_sentiment(text_list):
+def predict_sentiment_with_proba(text_list):
     tfidf_feat = compute_tfidf(text_list, vocab, idf)
-    preds = model.predict(tfidf_feat)
-    return preds
+    probas = model.predict_proba(tfidf_feat)  # shape (n_samples, n_classes)
+    class_labels = model.classes_  # to map indices to sentiment labels
+    return probas, class_labels
 
-import numpy as np
 
 rating_map = {
     '1': 'a',
@@ -403,30 +404,24 @@ rating_map = {
     '5': 'e',
 }
 
-st.title("Sentiment Analysis with Text & Rating")
+st.title("Sentiment Analysis with Confidence Percentages")
 
-text_input = st.text_area("Enter text (one or more lines, newline-separated)", height=150)
-rating_input = st.selectbox("Select rating", options=['1', '2', '3', '4', '5'])
+text_input = st.text_area("Enter text (one or more lines)", height=150)
+rating_input = st.selectbox("Select rating", ['1', '2', '3', '4', '5'])
 
 if st.button("Analyze Sentiment"):
     if text_input and rating_input:
-        # Split input into lines for batch processing
         text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
         combined_inputs = [f"{rating_map[rating_input]} {line}" for line in text_lines]
 
-        results = predict_sentiment(combined_inputs)
+        probabilities, classes = predict_sentiment_with_proba(combined_inputs)
 
-        # Show predictions per line
-        for line, sentiment in zip(text_lines, results):
-            st.write(f"**{line}** : {sentiment}")
-
-        # Calculate percentage distribution
-        classes, counts = np.unique(results, return_counts=True)
-        total = len(results)
-        st.write("### Sentiment Distribution")
-        for cls, count in zip(classes, counts):
-            percent = (count / total) * 100
-            st.write(f"{cls}: {percent:.2f}%")
+        for i, line in enumerate(text_lines):
+            st.write(f"Input: **{line}**")
+            for label, prob in zip(classes, probabilities[i]):
+                st.write(f"- {label}: {prob*100:.2f}%")
+            st.write("---")
     else:
         st.write("Please enter text and select rating.")
+
 
