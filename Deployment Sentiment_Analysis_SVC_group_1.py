@@ -9,6 +9,8 @@ Original file is located at
 """
 import os
 os.system('pip install nltk')
+import nltk
+nltk.download('stopwords')
 import pandas as pd
 import numpy as np
 import string
