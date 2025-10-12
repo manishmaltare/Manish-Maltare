@@ -393,9 +393,6 @@ def predict_sentiment(text_list):
     preds = model.predict(tfidf_feat)
     return preds
 
-st.title("Sentiment Analysis App")
-rating_map = {'1':'a', '2':'b', '3':'c', '4':'d', '5':'e'}
-
 st.title("Sentiment Analysis with Text and Rating Input")
 
 input_text = st.text_area("Enter text (body) here", height=150)
