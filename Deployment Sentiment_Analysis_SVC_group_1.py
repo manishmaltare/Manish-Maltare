@@ -17,8 +17,8 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import string
-!pip install streamlit
 import streamlit as st
+
 
 """### Dataset Loading"""
 
@@ -360,8 +360,6 @@ import pickle
 with open("svm_model.pkl", "wb") as f:
     pickle.dump(model_train_tuned, f)
 
-!pip install streamlit
-import streamlit as st
 from collections import defaultdict
 
 # Load your trained model
