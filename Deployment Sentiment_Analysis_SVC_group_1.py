@@ -11,7 +11,6 @@ Original file is located at
 
 import pandas as pd
 import numpy as np
-import nltk
 import string
 import streamlit as st
 
