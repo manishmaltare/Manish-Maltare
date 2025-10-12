@@ -375,12 +375,14 @@ model_train_tuned = sv_train.fit(x_train_vectorized, y_train)
 import pickle
 
 # Save the trained model to a .pkl file
+@st.cache(allow_output_mutation=True)
 with open("svm_model.pkl", "wb") as f:
     pickle.dump(model_train_tuned, f)
 
 from collections import defaultdict
 
 # Load your trained model
+@st.cache(allow_output_mutation=True)
 with open('svm_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
