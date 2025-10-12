@@ -10,7 +10,7 @@ Original file is located at
 import os
 os.system('pip install nltk')
 import nltk
-nltk.download('stopwords', quiet=True)
+nltk.download('stopwords', download_dir='english_stopwords.txt')
 import pandas as pd
 import numpy as np
 import string
