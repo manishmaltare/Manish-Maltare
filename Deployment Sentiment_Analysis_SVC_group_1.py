@@ -13,8 +13,7 @@ import nltk
 nltk.data.path.append('./nltk_data')
 from nltk.corpus import stopwords
 english_stopwords = set(stopwords.words('english'))
-import nltk
-nltk.download('punkt')
+from nltk.tokenize import word_tokenize
 import pandas as pd
 import numpy as np
 import string
