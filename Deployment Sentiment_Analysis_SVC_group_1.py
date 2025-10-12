@@ -16,8 +16,7 @@ import streamlit as st
 
 
 """### Dataset Loading"""
-!pip install openpyxl
-df = pd.read_excel('dataset -P582.xlsx')
+df = pd.read_csv('dataset -P582.csv')
 
 """### Data Pre-processing"""
 
