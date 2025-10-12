@@ -393,16 +393,30 @@ def predict_sentiment(text_list):
     preds = model.predict(tfidf_feat)
     return preds
 
-st.title("Sentiment Analysis with Text and Rating Input")
+rating_map = {
+    '1': 'a',
+    '2': 'b',
+    '3': 'c',
+    '4': 'd',
+    '5': 'e',
+}
 
-input_text = st.text_area("Enter text (body) here", height=150)
-input_rating = st.selectbox("Select Rating", options=['1','2','3','4','5'])
+st.title("Sentiment Analysis with Text & Rating")
 
-if st.button("Analyze"):
-    if input_text and input_rating:
-        combined = rating_map[input_rating] + " " + input_text
-        preds = predict_sentiment([combined])
-        sentiment = preds[0]
-        st.write(f"Predicted sentiment: **{sentiment}**")
+text_input = st.text_area("Enter text", height=100)
+rating_input = st.selectbox("Select rating", options=['1', '2', '3', '4', '5'])
+
+if st.button("Analyze Sentiment"):
+    if text_input and rating_input:
+        # Combine input exactly as in training: title + rating + body
+        # Here we treat text_input as the "body" (or you can add more inputs)
+        combined_input = " " + rating_map[rating_input] + " " + text_input
+        
+        results = predict_sentiment([combined_input])
+        sentiment = results[0]
+        
+        st.write(f"Predicted Sentiment: **{sentiment}**")
+        
+        # Optionally show % distribution if batch inputs
     else:
-        st.write("Please enter text and select a rating.")
+        st.write("Please enter text and select rating.")
