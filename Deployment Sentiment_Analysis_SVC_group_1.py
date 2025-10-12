@@ -13,7 +13,7 @@ import nltk
 import requests
 
 # Define the URL of the stopwords file on your GitHub repository
-STOPWORDS_URL = "https://raw.githubusercontent.com/manishmaltare/yourrepository/main/path/to/stopwords.txt"
+STOPWORDS_URL = "https://github.com/manishmaltare/Manish-Maltare/blob/main/english_stopwords.txt"
 
 # Function to load stopwords from GitHub
 def load_stopwords_from_github():
