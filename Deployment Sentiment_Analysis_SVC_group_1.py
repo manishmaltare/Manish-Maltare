@@ -13,10 +13,11 @@ import nltk
 import requests
 
 # Define the URL of the stopwords file on your GitHub repository
+STOPWORDS_URL = "https://raw.githubusercontent.com/manishmaltare/yourrepository/main/path/to/stopwords.txt"
 
 # Function to load stopwords from GitHub
 def load_stopwords_from_github():
-    response = requests.get("english_stopwords.txt")
+    response = requests.get(STOPWORDS_URL)
     if response.status_code == 200:
         # Assuming the stopwords are stored as a plain text file with one word per line
         stopwords_list = response.text.splitlines()
@@ -37,6 +38,7 @@ hindi_noise_words = [
 
 # Combine English stopwords with Hindi noise words
 stop_words = english_stopwords.union(set(hindi_noise_words))
+
 
 from nltk.tokenize import word_tokenize
 import pandas as pd
