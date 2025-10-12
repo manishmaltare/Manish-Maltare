@@ -393,6 +393,8 @@ def predict_sentiment(text_list):
     preds = model.predict(tfidf_feat)
     return preds
 
+import numpy as np
+
 rating_map = {
     '1': 'a',
     '2': 'b',
@@ -403,20 +405,28 @@ rating_map = {
 
 st.title("Sentiment Analysis with Text & Rating")
 
-text_input = st.text_area("Enter text", height=100)
+text_input = st.text_area("Enter text (one or more lines, newline-separated)", height=150)
 rating_input = st.selectbox("Select rating", options=['1', '2', '3', '4', '5'])
 
 if st.button("Analyze Sentiment"):
     if text_input and rating_input:
-        # Combine input exactly as in training: title + rating + body
-        # Here we treat text_input as the "body" (or you can add more inputs)
-        combined_input = " " + rating_map[rating_input] + " " + text_input
-        
-        results = predict_sentiment([combined_input])
-        sentiment = results[0]
-        
-        st.write(f"Predicted Sentiment: **{sentiment}**")
-        
-        # Optionally show % distribution if batch inputs
+        # Split input into lines for batch processing
+        text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
+        combined_inputs = [f"{rating_map[rating_input]} {line}" for line in text_lines]
+
+        results = predict_sentiment(combined_inputs)
+
+        # Show predictions per line
+        for line, sentiment in zip(text_lines, results):
+            st.write(f"**{line}** : {sentiment}")
+
+        # Calculate percentage distribution
+        classes, counts = np.unique(results, return_counts=True)
+        total = len(results)
+        st.write("### Sentiment Distribution")
+        for cls, count in zip(classes, counts):
+            percent = (count / total) * 100
+            st.write(f"{cls}: {percent:.2f}%")
     else:
         st.write("Please enter text and select rating.")
+
