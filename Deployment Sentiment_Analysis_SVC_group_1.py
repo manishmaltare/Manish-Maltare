@@ -394,24 +394,18 @@ def predict_sentiment(text_list):
     return preds
 
 st.title("Sentiment Analysis App")
-input_text = st.text_area("Enter text (one per line)", height=200)
-texts = [t.strip() for t in input_text.split('\n') if t.strip()]
+rating_map = {'1':'a', '2':'b', '3':'c', '4':'d', '5':'e'}
 
-if st.button("Analyze Sentiment"):
-    if texts:
-        results = predict_sentiment(texts)
-        sentiment_count = {"Positive":0, "Negative":0, "Neutral":0}
-        for res in results:
-            sentiment_count[res] += 1
-        total = len(results)
+st.title("Sentiment Analysis with Text and Rating Input")
 
-        st.write("### Predictions")
-        for text, res in zip(texts, results):
-            st.write(f"**{text}** : {res}")
+input_text = st.text_area("Enter text (body) here", height=150)
+input_rating = st.selectbox("Select Rating", options=['1','2','3','4','5'])
 
-        st.write("### Sentiment Distribution (%)")
-        for cat in sentiment_count:
-            percent = (sentiment_count[cat] / total) * 100
-            st.write(f"{cat}: {percent:.2f}%")
+if st.button("Analyze"):
+    if input_text and input_rating:
+        combined = rating_map[input_rating] + " " + input_text
+        preds = predict_sentiment([combined])
+        sentiment = preds[0]
+        st.write(f"Predicted sentiment: **{sentiment}**")
     else:
-        st.write("Please enter at least one sentence.")
+        st.write("Please enter text and select a rating.")
