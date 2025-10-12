@@ -10,9 +10,34 @@ Original file is located at
 import os
 os.system('pip install nltk')
 import nltk
-nltk.data.path.append('./nltk_data')
-from nltk.corpus import stopwords
-english_stopwords = set(stopwords.words('english'))
+import requests
+
+# Define the URL of the stopwords file on your GitHub repository
+
+# Function to load stopwords from GitHub
+def load_stopwords_from_github():
+    response = requests.get("english_stopwords.txt")
+    if response.status_code == 200:
+        # Assuming the stopwords are stored as a plain text file with one word per line
+        stopwords_list = response.text.splitlines()
+        return set(stopwords_list)
+    else:
+        raise Exception(f"Failed to load stopwords from GitHub: {response.status_code}")
+
+# Load the stopwords
+english_stopwords = load_stopwords_from_github()
+
+# Additional custom Hindi stopwords
+hindi_noise_words = [
+    'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
+    'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
+    'nhi', 'fir', 'phir', 'lekin', 'par', 'apne', 'usko', 'kuch', 'hoga',
+    'kya', 'tera', 'mera', 'diya', 'diye', 'de'
+]
+
+# Combine English stopwords with Hindi noise words
+stop_words = english_stopwords.union(set(hindi_noise_words))
+
 from nltk.tokenize import word_tokenize
 import pandas as pd
 import numpy as np
