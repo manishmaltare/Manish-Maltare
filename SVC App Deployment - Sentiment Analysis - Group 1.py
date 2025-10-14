@@ -179,19 +179,40 @@ def get_sentiment_score(word):
     return sentiment_lexicon.get(word, 0)
 
 # Compound sentiment score for input text
-def calculate_compound_score(text):
-    tokens = preprocess_text(text).split()
-    return sum(get_sentiment_score(token) for token in tokens)
+def calculate_compound_score_with_negation(text, negation_words=set()):
+    tokens = preprocess_text(text)
+    compound_score = 0.0
+    negate_scope = 0  # number of words to negate after negation word
+    NEGATION_WINDOW = 3  # number of words to invert after negation
+
+    for token in tokens:
+        score = get_sentiment_score(token)
+
+        # If current token is a negation word, enable negation window
+        if token in negation_words:
+            negate_scope = NEGATION_WINDOW
+            continue  # negation words themselves usually no polarity score
+
+        # If inside negation scope, invert polarity
+        if negate_scope > 0:
+            score = -score
+            negate_scope -= 1
+
+        compound_score += score
+
+    return compound_score
+
 
 # Sentiment category from score
 def get_sentiment_category(text):
-    compound_score = calculate_compound_score(text)
+    compound_score = calculate_compound_score_with_negation(text, negation_words)
     if compound_score >= 0.05:
         return "Positive"
     elif compound_score <= -0.05:
         return "Negative"
     else:
         return "Neutral"
+
 
 # Assuming df_new_2['body'] is your input column
 df_new_2['body_sentiments'] = df_new_2['body'].apply(get_sentiment_category)
