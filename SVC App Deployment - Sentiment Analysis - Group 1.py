@@ -370,22 +370,18 @@ sv_train = SVC(kernel='linear', gamma='scale', degree=2, C=4.6415888336127775, p
 model_train_tuned = sv_train.fit(x_train_vectorized, y_train)
 
 
-
-import pickle
-
-# Save the trained model to a .pkl file
-with open("svm_model.pkl", "wb") as f:
-    pickle.dump(model_train_tuned, f)
-
+import string
 from collections import defaultdict
+import streamlit as st
 
-# Load your trained model
+# Load trained model
 with open('svm_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-
-# Load or rebuild vocab and idf from training (if not already loaded)
-# Assuming vocab and idf are already available from your training process
+# Load or rebuild your vocab and idf here; they must match the training version
+# Example:
+# vocab = loaded_vocab
+# idf = loaded_idf
 
 def preprocess_text(text):
     text = text.lower()
@@ -411,21 +407,18 @@ def compute_tfidf(text_list, vocab, idf):
 
 def predict_sentiment_with_proba(text_list):
     tfidf_feat = compute_tfidf(text_list, vocab, idf)
-    probas = model.predict_proba(tfidf_feat)  # shape (n_samples, n_classes)
-    class_labels = model.classes_  # to map indices to sentiment labels
+    probas = model.predict_proba(tfidf_feat)
+    class_labels = model.classes_
     return probas, class_labels
 
-# Streamlit UI
-st.title("Sentiment Analysis using SVC Model 😊😐😞")
+# Streamlit app
+st.title("Sentiment Analysis with Confidence Percentages 😊😐😞")
 
-# Text input for the body of the review (no rating field now)
-text_input = st.text_area("Enter the body text", height=150)
+text_input = st.text_area("Enter text (one or more lines)", height=150)
 
 if st.button("Analyze Sentiment"):
     if text_input:
         text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
-        
-        # Using only the body text for sentiment analysis
         probabilities, classes = predict_sentiment_with_proba(text_lines)
 
         for i, line in enumerate(text_lines):
@@ -434,4 +427,5 @@ if st.button("Analyze Sentiment"):
                 st.write(f"- {label}: {prob*100:.2f}%")
             st.write("---")
     else:
-        st.write("Please enter text.")
+        st.write("Please enter text to analyze.")
+
