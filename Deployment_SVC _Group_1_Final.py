@@ -134,8 +134,6 @@ def vectorized_clean_series(s: pd.Series):
 
     return s
 
-import re
-
 def handle_negation(text):
     negation_words = ["not", "no", "never", "n't", "cannot", "can't", "won't", "didn't", "doesn't", "isn't", "wasn't"]
     tokens = re.findall(r"\w+|[^\w\s]", text.lower(), re.UNICODE)
@@ -151,9 +149,7 @@ def handle_negation(text):
             negate = False
         else:
             new_tokens.append(token)
-    
     return " ".join(new_tokens)
-
 
 def vectorized_clean_series(s: pd.Series):
     s = s.fillna('').astype(str)
