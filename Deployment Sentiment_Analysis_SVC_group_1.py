@@ -425,10 +425,6 @@ rating_map = {
 }
 
 st.title("Sentiment Analysis based on Text and Rating - SVC model 😊😐😞")
-
-text_input = st.text_area("Enter text (one or more lines)", height=150)
-rating_input = st.selectbox("Select rating", ['1', '2', '3', '4', '5'])
-
 if st.button("Analyze Sentiment"):
     if text_input and rating_input:
         text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
@@ -438,10 +434,12 @@ if st.button("Analyze Sentiment"):
 
         for i, line in enumerate(text_lines):
             st.write(f"Input: **{line}**")
-            for label, prob in zip(classes, probabilities[i]):
-                st.write(f"- {label}: {prob*100:.2f}%")
+            max_idx = probabilities[i].argmax()  # index with max probability
+            for idx, (label, prob) in enumerate(zip(classes, probabilities[i])):
+                if idx == max_idx:
+                    st.write(f"- **{label}: {prob*100:.2f}%**")  # bold for max prob
+                else:
+                    st.write(f"- {label}: {prob*100:.2f}%")  # normal for others
             st.write("---")
     else:
         st.write("Please enter text and select rating.")
-
-
