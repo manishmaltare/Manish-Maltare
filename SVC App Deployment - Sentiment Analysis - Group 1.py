@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import string
 import streamlit as st
+import re
 
 
 
@@ -23,12 +24,10 @@ df = pd.read_csv('dataset -P582.csv')
 
 
 
-import re
 
 # --- STEP 1: DEFINE AUGMENTED STOP WORDS AND MAPPING DICTIONARY ---
 
 # 1. Common Romanized Hindi Function Words (Noise)
-# Add these to your English stopwords list.
 hindi_noise_words = [
     'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
     'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
@@ -37,7 +36,6 @@ hindi_noise_words = [
 ]
 
 # 2. Key Romanized Sentiment/Functional Word Mapping
-# This translates key Hinglish words to their English equivalents.
 romanized_mapping = {
     'accha': 'good',
     'acha': 'good',
@@ -64,37 +62,35 @@ romanized_mapping = {
     'bada':'big'
 }
 
-# 3. Download resources and create the final augmented stop_words set
+# 3. Download NLTK resources
 nltk.download('stopwords', quiet=True)
 nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab', quiet=True) # Add this line to download punkt_tab
 
-# Define the URL of the stopwords file on your GitHub repository
+# 4. Define the URL of English stopwords file on your GitHub
 STOPWORDS_URL = "https://github.com/manishmaltare/Manish-Maltare/blob/main/english_stopwords.txt"
 
 # Function to load stopwords from GitHub
 def load_stopwords_from_github():
     response = requests.get(STOPWORDS_URL)
     if response.status_code == 200:
-        # Assuming the stopwords are stored as a plain text file with one word per line
         stopwords_list = response.text.splitlines()
         return set(stopwords_list)
     else:
         raise Exception(f"Failed to load stopwords from GitHub: {response.status_code}")
 
-# Load the stopwords
+# Load English stopwords
 english_stopwords = load_stopwords_from_github()
 
-# Additional custom Hindi stopwords
-hindi_noise_words = [
-    'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
-    'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
-    'nhi', 'fir', 'phir', 'lekin', 'par', 'apne', 'usko', 'kuch', 'hoga',
-    'kya', 'tera', 'mera', 'diya', 'diye', 'de'
-]
+# List of common negation words to add
+negation_words = {
+    'no', 'not', 'nor', "n't", 'never', 'none', 'nothing', 'nowhere',
+    'neither', 'cannot', 'can\'t', 'don\'t', 'doesn\'t', 'didn\'t',
+    'won\'t', 'wouldn\'t', 'shouldn\'t', 'isn\'t', 'aren\'t', 'ain\'t',
+    'without', 'barely', 'hardly', 'rarely', 'seldom'
+}
 
-# Combine English stopwords with Hindi noise words
-stop_words = english_stopwords.union(set(hindi_noise_words))
+# Combine English stopwords, Hindi noise words, and negation words
+stop_words = english_stopwords.union(set(hindi_noise_words)).union(negation_words)
 
 # --- STEP 2: MODIFIED CLEANING FUNCTION ---
 
