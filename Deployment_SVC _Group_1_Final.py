@@ -153,6 +153,18 @@ def get_sentiment_category(text):
         return "Neutral"
 
 # --- STEP 4: Preprocessing Data and Model ---
+# Create a new DataFrame with cleaned columns
+df_new_2 = df.copy()
+
+df_new_2['title'] = vectorized_clean_series(df_new_2['title'])
+df_new_2['body']  = vectorized_clean_series(df_new_2['body'])
+
+df_new_2['rating'] = df['rating']
+
+df_new_2['title_text_length'] = df_new_2['title'].apply(lambda x: len(str(x).split()))
+
+df_new_2['body_text_length'] = df_new_2['body'].apply(lambda x: len(str(x).split()))
+
 # Assuming df_new_2['body'] is your input column, we apply the negation handler
 df_new_2['body'] = df_new_2['body'].apply(handle_negation)
 
