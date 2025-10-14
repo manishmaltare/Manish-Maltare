@@ -71,7 +71,10 @@ negation_words = set(['not', 'no', 'never', 'none', 'neither', 'nor', 'nahi', 'n
 
 # --- STEP 2: MODIFIED CLEANING FUNCTION WITH NEGATION HANDLING ---
 
-### NEW: Add function to handle negations
+
+# --- STEP 2: MODIFIED CLEANING FUNCTION WITH NEGATION HANDLING ---
+
+### NEW: Add function to handle negations (as you already have)
 def handle_negations(tokens):
     negated = False  # Flag to track negation
     new_tokens = []   # New list for modified tokens
@@ -111,16 +114,16 @@ def vectorized_clean_series(s: pd.Series):
     s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
 
     # 4. Tokenize, handle negations, and remove augmented stopwords
-    ### NEW: Modified lambda to include negation handling
-    s = s.apply(lambda x: 
+    ### FIXED: Replace the lambda with a helper function
+    def process_text(x):
         tokens = word_tokenize(x)  # Tokenize
         handled_tokens = handle_negations(tokens)  # Handle negations
         filtered_tokens = [word for word in handled_tokens if word not in stop_words and word]  # Remove stop words
         return ' '.join(filtered_tokens)  # Rejoin
-    )
+    
+    s = s.apply(process_text)  # Now use the helper function
     
     return s
-
 # The rest of your code remains unchanged...
 # (Continue with df_new_2 processing, model training, and Streamlit app as in your original code)
 
