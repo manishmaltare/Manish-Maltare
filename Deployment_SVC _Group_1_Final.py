@@ -428,7 +428,13 @@ import string
 from collections import defaultdict
 import streamlit as st
 
-# Load trained model
+# Save the trained model to a .pkl file
+with open("svm_model.pkl", "wb") as f:
+    pickle.dump(model_train_tuned, f)
+
+from collections import defaultdict
+
+# Load your trained model
 with open('svm_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
