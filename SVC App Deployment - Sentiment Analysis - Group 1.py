@@ -69,23 +69,42 @@ stop_words = english_stopwords.union(set(hindi_noise_words))
 ### NEW: Add negation words set (minimal but effective list)
 negation_words = set(['not', 'no', 'never', 'none', 'neither', 'nor', 'nahi', 'nhi', 'without', 'hardly', 'barely'])  # Expanded but still concise list
 
-# --- STEP 2: MODIFIED CLEANING FUNCTION WITH NEGATION HANDLING ---
+# In your code, replace the relevant sections in --- STEP 2: MODIFIED CLEANING FUNCTION ---
 
+### NEW: Expanded list of negation words and phrases
+# This includes single words and common 1-3 word phrases. You can add more based on your dataset.
+negation_triggers = set([
+    'not', 'no', 'never', 'none', 'neither', 'nor', 'nahi', 'nhi',  # Single words
+    'is not', 'not good', 'not bad', 'not working',  # 2-word phrases
+    'is not good', 'does not work', 'not at all'  # 3-word phrases
+])
 
-# --- STEP 2: MODIFIED CLEANING FUNCTION WITH NEGATION HANDLING ---
-
-### NEW: Add function to handle negations (as you already have)
+### NEW: Updated handle_negations function to handle phrases and negate next 1-3 words
 def handle_negations(tokens):
-    negated = False  # Flag to track negation
+    negated = False  # Flag to track if we're in a negated context
+    negate_count = 0  # Counter to negate the next 1-3 words
     new_tokens = []   # New list for modified tokens
-    for token in tokens:
-        if token in negation_words:
-            negated = True  # Set flag if negation word is found
+    i = 0  # Index for iterating through tokens
+    while i < len(tokens):
+        token = tokens[i]
+        
+        # Check if the current token or phrase matches a negation trigger
+        if token in negation_triggers:
+            negated = True  # Start negation
+            negate_count = 1  # Start with 1 word to negate, but we can extend
+            new_tokens.append(token)  # Keep the negation word as is
         elif negated:
-            new_tokens.append(token + "_NEG")  # Append _NEG to the next word
-            negated = False  # Reset flag
+            # Negate the next word(s) - up to 3 words or until the end
+            if negate_count <= 3:  # Limit to 3 words
+                new_tokens.append(token + "_NEG")  # Modify the word
+                negate_count += 1
+            else:
+                negated = False  # Stop after 3 words
         else:
-            new_tokens.append(token)  # Add token as is
+            new_tokens.append(token)  # Add as is
+        
+        i += 1  # Move to next token
+    
     return new_tokens
 
 def vectorized_clean_series(s: pd.Series):
@@ -114,14 +133,13 @@ def vectorized_clean_series(s: pd.Series):
     s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
 
     # 4. Tokenize, handle negations, and remove augmented stopwords
-    ### FIXED: Replace the lambda with a helper function
     def process_text(x):
         tokens = word_tokenize(x)  # Tokenize
         handled_tokens = handle_negations(tokens)  # Handle negations
         filtered_tokens = [word for word in handled_tokens if word not in stop_words and word]  # Remove stop words
         return ' '.join(filtered_tokens)  # Rejoin
     
-    s = s.apply(process_text)  # Now use the helper function
+    s = s.apply(process_text)  # Use the helper function
     
     return s
 # The rest of your code remains unchanged...
