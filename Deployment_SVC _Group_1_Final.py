@@ -154,12 +154,6 @@ def handle_negation(text):
     
     return " ".join(new_tokens)
 
-# Example test
-print(handle_negation("I will not be happy"))
-# Output should be: "i will not be happy_NEG"
-
-    return " ".join(new_tokens)
-
 
 def vectorized_clean_series(s: pd.Series):
     s = s.fillna('').astype(str)
