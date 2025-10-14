@@ -412,7 +412,7 @@ def predict_sentiment_with_proba(text_list):
     return probas, class_labels
 
 # Streamlit app
-st.title("Sentiment Analysis with Confidence Percentages 😊😐😞")
+st.title("Sentiment Analysis based on Text - SVC model 😊😐😞")
 
 text_input = st.text_area("Enter text (one or more lines)", height=150)
 
