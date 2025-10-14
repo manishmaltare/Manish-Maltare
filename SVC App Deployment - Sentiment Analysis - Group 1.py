@@ -16,123 +16,17 @@ import pandas as pd
 import numpy as np
 import string
 import streamlit as st
-
-
-
+import re  # Ensure re is imported
 df = pd.read_csv('dataset -P582.csv')
-
-
-
-import re
-
-# --- STEP 1: DEFINE AUGMENTED STOP WORDS AND MAPPING DICTIONARY ---
-
+# --- STEP 1: DEFINE AUGMENTED STOP WORDS, MAPPING DICTIONARY, AND NEGATION WORDS ---
 # 1. Common Romanized Hindi Function Words (Noise)
-# Add these to your English stopwords list.
 hindi_noise_words = [
     'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
     'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
     'nhi', 'fir', 'phir', 'lekin', 'par', 'apne', 'usko', 'kuch', 'hoga',
     'kya', 'tera', 'mera', 'diya', 'diye', 'de'
 ]
-
 # 2. Key Romanized Sentiment/Functional Word Mapping
-# This translates key Hinglish words to their English equivalents.
-romanized_mapping = {
-    'accha': 'good',
-    'acha': 'good',
-    'achha': 'good',
-    'bahut': 'very',
-    'bhut': 'very',
-    'kharab': 'bad',
-    'bekar': 'bad',
-    'sahi': 'correct',
-    'nhi': 'not',
-    'nahi': 'not',
-    'milega': 'receive',
-    'mila': 'received',
-    'liya': 'take',
-    'diya': 'give',
-    'lene': 'take',
-    'achcha':'good',
-    'achhi':'good',
-    'achchaa':'good',
-    'acchi':'good',
-    'aap':'you',
-    'bakwaas':'bad',
-    'bakwas':'bad',
-    'bada':'big'
-}
-
-# 3. Download resources and create the final augmented stop_words set
-nltk.download('stopwords', quiet=True)
-nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab', quiet=True) # Add this line to download punkt_tab
-
-# Define the URL of the stopwords file on your GitHub repository
-STOPWORDS_URL = "https://github.com/manishmaltare/Manish-Maltare/blob/main/english_stopwords.txt"
-
-# Function to load stopwords from GitHub
-def load_stopwords_from_github():
-    response = requests.get(STOPWORDS_URL)
-    if response.status_code == 200:
-        # Assuming the stopwords are stored as a plain text file with one word per line
-        stopwords_list = response.text.splitlines()
-        return set(stopwords_list)
-    else:
-        raise Exception(f"Failed to load stopwords from GitHub: {response.status_code}")
-
-# Load the stopwords
-english_stopwords = load_stopwords_from_github()
-
-# Additional custom Hindi stopwords
-hindi_noise_words = [
-    'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
-    'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
-    'nhi', 'fir', 'phir', 'lekin', 'par', 'apne', 'usko', 'kuch', 'hoga',
-    'kya', 'tera', 'mera', 'diya', 'diye', 'de'
-]
-
-# Combine English stopwords with Hindi noise words
-stop_words = english_stopwords.union(set(hindi_noise_words))
-
-# --- STEP 2: MODIFIED CLEANING FUNCTION ---
-
-def vectorized_clean_series(s: pd.Series):
-    s = s.fillna('').astype(str)
-    s = s.str.normalize('NFKC')
-    s = s.str.lower()
-
-    # 1. Initial cleanup (URLs, emails, HTML, numbers)
-    s = s.str.replace(r'http\S+|www\.\S+', ' ', regex=True)
-    s = s.str.replace(r'\S+@\S+', ' ', regex=True)
-    s = s.str.replace(r'<.*?>', ' ', regex=True)
-    s = s.str.replace(r'\d+(?:[.,]\d+)*', ' ', regex=True)
-
-    # 2. HINGLISH MAPPING (Must happen before punctuation/tokenization)
-
-    def replace_romanized_words(text):
-        if not text:
-            return ""
-        # The text is already lower-cased from a previous step
-        words = text.split()
-
-        # Replace words based on the dictionary
-        words = [romanized_mapping.get(word, word) for word in words]
-
-        return ' '.join(words)
-
-    s = s.apply(replace_romanized_words)
-
-    # 3. Final structural cleanup (Punctuation and whitespace)
-    s = s.str.replace(r'[^a-z\s]', ' ', regex=True)
-    s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
-
-    # 4. Tokenize and remove augmented stopwords
-
-    s = s.apply(lambda x: ' '.join([word for word in word_tokenize(x) if word not in stop_words and word]))
-
-    return s
 
 # Create a new DataFrame with cleaned columns
 df_new_2 = df.copy()
