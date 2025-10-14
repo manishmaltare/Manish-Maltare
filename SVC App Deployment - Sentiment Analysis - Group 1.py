@@ -371,12 +371,18 @@ model_train_tuned = sv_train.fit(x_train_vectorized, y_train)
 
 
 
-import streamlit as st
 import pickle
 
-# Load the trained model (assuming the model is saved as svm_model.pkl)
+# Save the trained model to a .pkl file
+with open("svm_model.pkl", "wb") as f:
+    pickle.dump(model_train_tuned, f)
+
+from collections import defaultdict
+
+# Load your trained model
 with open('svm_model.pkl', 'rb') as f:
     model = pickle.load(f)
+
 
 # Load or rebuild vocab and idf from training (if not already loaded)
 # Assuming vocab and idf are already available from your training process
