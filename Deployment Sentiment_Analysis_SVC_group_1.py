@@ -362,7 +362,6 @@ x_test_vectorized = compute_tfidf(processed_test, vocab, idf)
 
 import pickle
 from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
 
 # Assuming you already have x_train_vectorized and y_train
 
