@@ -141,7 +141,7 @@ def handle_negation(text):
     tokens = re.findall(r"\w+|[^\w\s]", text.lower(), re.UNICODE)
     new_tokens = []
     negate = False
-
+    
     for token in tokens:
         if token in negation_words:
             negate = True
@@ -151,6 +151,13 @@ def handle_negation(text):
             negate = False
         else:
             new_tokens.append(token)
+    
+    return " ".join(new_tokens)
+
+# Example test
+print(handle_negation("I will not be happy"))
+# Output should be: "i will not be happy_NEG"
+
     return " ".join(new_tokens)
 
 
