@@ -425,6 +425,19 @@ rating_map = {
 }
 
 st.title("Sentiment Analysis based on Text and Rating - SVC model 😊😐😞")
+
+# Capture user inputs outside the button click block
+text_input = st.text_area("Enter text (one or more lines)", height=150)
+rating_input = st.selectbox("Select rating", ['1', '2', '3', '4', '5'])
+
+def predict_sentiment_with_proba(text_list):
+    # Your actual prediction code calling model here
+    # For demonstration, example dummy classes and probs:
+    class_labels = ['positive', 'neutral', 'negative']
+    import numpy as np
+    probas = np.array([[0.1, 0.1, 0.8] for _ in text_list])  # dummy probabilities
+    return probas, class_labels
+
 if st.button("Analyze Sentiment"):
     if text_input and rating_input:
         text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
