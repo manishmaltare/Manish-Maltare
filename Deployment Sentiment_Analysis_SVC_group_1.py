@@ -424,7 +424,7 @@ rating_map = {
     '5': 'e',
 }
 
-st.title("Sentiment Analysis with Confidence Percentages 😊😐😞")
+st.title("Sentiment Analysis based on Text and Rating - SVC model 😊😐😞")
 
 text_input = st.text_area("Enter text (one or more lines)", height=150)
 rating_input = st.selectbox("Select rating", ['1', '2', '3', '4', '5'])
