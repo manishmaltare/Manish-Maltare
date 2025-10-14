@@ -411,6 +411,7 @@ def predict_sentiment_with_proba(text_list):
     class_labels = model.classes_
     return probas, class_labels
 
+
 # Streamlit app
 # At the top of your Streamlit app UI code:
 st.title("Sentiment Analysis 😊😐😞")
