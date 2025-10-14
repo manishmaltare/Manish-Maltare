@@ -106,34 +106,31 @@ def vectorized_clean_series(s: pd.Series):
     s = s.str.normalize('NFKC')
     s = s.str.lower()
 
-    # 1. Initial cleanup (URLs, emails, HTML, numbers)
+    # initial cleanup (URLs, emails, etc.)
     s = s.str.replace(r'http\S+|www\.\S+', ' ', regex=True)
     s = s.str.replace(r'\S+@\S+', ' ', regex=True)
     s = s.str.replace(r'<.*?>', ' ', regex=True)
     s = s.str.replace(r'\d+(?:[.,]\d+)*', ' ', regex=True)
 
-    # 2. HINGLISH MAPPING (Must happen before punctuation/tokenization)
-
+    # romanized word mapping
     def replace_romanized_words(text):
         if not text:
             return ""
-        # The text is already lower-cased from a previous step
         words = text.split()
-
-        # Replace words based on the dictionary
         words = [romanized_mapping.get(word, word) for word in words]
-
         return ' '.join(words)
 
     s = s.apply(replace_romanized_words)
 
-    # 3. Final structural cleanup (Punctuation and whitespace)
+    # remove non alpha except spaces
     s = s.str.replace(r'[^a-z\s]', ' ', regex=True)
     s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
 
-    # 4. Tokenize and remove augmented stopwords
-
-    s = s.apply(lambda x: ' '.join([word for word in word_tokenize(x) if word not in stop_words and word]))
+    # keep tokens that are NOT stopwords or that ARE negation words
+    s = s.apply(lambda x: ' '.join([
+        word for word in word_tokenize(x)
+        if (word not in stop_words) or (word in negation_words)
+    ]))
 
     return s
 
