@@ -173,20 +173,7 @@ def preprocess_text(text):
 
 # Get sentiment score from the lexicon, default 0
 def get_sentiment_score(word):
-    """
-    Returns sentiment score for a word, flipping the sentiment if the word is negated.
-    """
-    # Check if the word is negated (has '_neg' suffix)
-    is_negated = word.endswith("_neg")
-    word = word.replace("_neg", "")  # Remove '_neg' for lookup
-    
-    score = sentiment_lexicon.get(word, 0)  # Default score is 0 if word not found
-    
-    if is_negated:
-        score = -score  # Flip the sentiment score for negated words
-    
-    return score
-
+    return sentiment_lexicon.get(word, 0)
 
 # Compound sentiment score for input text
 def calculate_compound_score(text):
@@ -232,38 +219,10 @@ y_test = y.iloc[1008:]
 x_train['combined'] = x_train['title']+x_train['rating']+x_train['body']
 x_test['combined'] = x_test['title']+x_test['rating']+x_test['body']
 
-negation_words = ['not', "n't", 'no', 'never', 'nothing', 'none', 'nowhere']
-def handle_negation_in_text(text):
-    """
-    This function handles negation in the input text.
-    It flips the sentiment of the words following negation words.
-    """
-    words = text.split()
-    negation_flag = False  # Flag to track if we're after a negation word
-    processed_words = []
-    
-    for word in words:
-        if word in negation_words:
-            negation_flag = True
-            processed_words.append(word)  # Add the negation word itself
-        elif negation_flag:
-            # If the word comes after a negation word, we flip its sentiment
-            # For simplicity, we'll append a special marker (e.g., '_neg') to denote the negated word
-            processed_words.append(word + "_neg")
-            negation_flag = False  # Reset after one negated word
-        else:
-            processed_words.append(word)
-    
-    return ' '.join(processed_words)
-
-
-def preprocess_text(text):
-    """
-    Preprocess the text by handling negations and cleaning the text.
-    """
-    text = text.lower()
-    text = text.translate(str.maketrans('', '', string.punctuation))  # remove punctuation
-    text = handle_negation_in_text(text)  # Handle negation
+def preprocess(text):
+    if not isinstance(text, str):
+        return []
+    text = text.lower().translate(str.maketrans('', '', string.punctuation))  # remove punctuation
     return text.split()
 import math
 from collections import defaultdict
@@ -467,11 +426,8 @@ text_input = st.text_area("Enter text (one or more lines)", height=150)
 
 if st.button("Analyze Sentiment"):
     if text_input:
-        # Split text into lines, clean the lines and handle negations
         raw_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
         cleaned_lines = vectorized_clean_series(pd.Series(raw_lines)).tolist()
-        
-        # Get sentiment probabilities
         probabilities, classes = predict_sentiment_with_proba(cleaned_lines)
 
         for i, line in enumerate(raw_lines):
