@@ -12,6 +12,8 @@ from collections import defaultdict
 from sklearn.svm import SVC
 import math
 
+df = pd.read_csv('dataset -P582.csv')
+
 # Ensure that nltk resources are available
 nltk.download('punkt', quiet=True)
 
