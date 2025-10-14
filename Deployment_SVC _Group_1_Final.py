@@ -168,7 +168,7 @@ def vectorized_clean_series(s: pd.Series):
             return ""
         words = text.split()
         words = [romanized_mapping.get(word, word) for word in words]
-        return ' '.join(words)
+    return ' '.join(words)
 
     s = s.apply(replace_romanized_words)
 
