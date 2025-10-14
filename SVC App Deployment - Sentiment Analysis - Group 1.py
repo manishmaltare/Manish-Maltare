@@ -89,8 +89,15 @@ negation_words = {
     'without', 'barely', 'hardly', 'rarely', 'seldom'
 }
 
-# Combine English stopwords, Hindi noise words, and negation words
-stop_words = english_stopwords.union(set(hindi_noise_words)).union(negation_words)
+# Combine English stopwords and Hindi noise words but EXCLUDE negation words
+combined_stopwords = english_stopwords.union(set(hindi_noise_words))
+
+# Remove negation words from stopwords to keep them in text
+stop_words = combined_stopwords.difference(negation_words)
+
+# Negation words are kept separately for explicit handling during preprocessing
+# You can use this list to implement negation scope detection or feature engineering
+
 
 # --- STEP 2: MODIFIED CLEANING FUNCTION ---
 
