@@ -27,7 +27,7 @@ romanized_mapping = {
     'kharab': 'bad',
     'bekar': 'bad',
     'sahi': 'correct',
-    'nhi': 'not',
+    'nhi': 'not',}
 
 df_new_2['title'] = vectorized_clean_series(df_new_2['title'])
 df_new_2['body']  = vectorized_clean_series(df_new_2['body'])
