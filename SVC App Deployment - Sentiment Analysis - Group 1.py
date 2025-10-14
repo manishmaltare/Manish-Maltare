@@ -16,7 +16,6 @@ import pandas as pd
 import numpy as np
 import string
 import streamlit as st
-import re
 
 
 
@@ -24,10 +23,12 @@ df = pd.read_csv('dataset -P582.csv')
 
 
 
+import re
 
 # --- STEP 1: DEFINE AUGMENTED STOP WORDS AND MAPPING DICTIONARY ---
 
 # 1. Common Romanized Hindi Function Words (Noise)
+# Add these to your English stopwords list.
 hindi_noise_words = [
     'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
     'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
@@ -36,6 +37,7 @@ hindi_noise_words = [
 ]
 
 # 2. Key Romanized Sentiment/Functional Word Mapping
+# This translates key Hinglish words to their English equivalents.
 romanized_mapping = {
     'accha': 'good',
     'acha': 'good',
@@ -62,42 +64,37 @@ romanized_mapping = {
     'bada':'big'
 }
 
-# 3. Download NLTK resources
+# 3. Download resources and create the final augmented stop_words set
 nltk.download('stopwords', quiet=True)
 nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True) # Add this line to download punkt_tab
 
-# 4. Define the URL of English stopwords file on your GitHub
+# Define the URL of the stopwords file on your GitHub repository
 STOPWORDS_URL = "https://github.com/manishmaltare/Manish-Maltare/blob/main/english_stopwords.txt"
 
 # Function to load stopwords from GitHub
 def load_stopwords_from_github():
     response = requests.get(STOPWORDS_URL)
     if response.status_code == 200:
+        # Assuming the stopwords are stored as a plain text file with one word per line
         stopwords_list = response.text.splitlines()
         return set(stopwords_list)
     else:
         raise Exception(f"Failed to load stopwords from GitHub: {response.status_code}")
 
-# Load English stopwords
+# Load the stopwords
 english_stopwords = load_stopwords_from_github()
 
-# List of common negation words to add
-negation_words = {
-    'no', 'not', 'nor', "n't", 'never', 'none', 'nothing', 'nowhere',
-    'neither', 'cannot', 'can\'t', 'don\'t', 'doesn\'t', 'didn\'t',
-    'won\'t', 'wouldn\'t', 'shouldn\'t', 'isn\'t', 'aren\'t', 'ain\'t',
-    'without', 'barely', 'hardly', 'rarely', 'seldom'
-}
+# Additional custom Hindi stopwords
+hindi_noise_words = [
+    'ka', 'ki', 'ke', 'aur', 'hai', 'main', 'mai', 'bhi', 'yeh', 'ye',
+    'ko', 'mein', 'me', 'to', 'ho', 'hona', 'tha', 'thi', 'the',
+    'nhi', 'fir', 'phir', 'lekin', 'par', 'apne', 'usko', 'kuch', 'hoga',
+    'kya', 'tera', 'mera', 'diya', 'diye', 'de'
+]
 
-# Combine English stopwords and Hindi noise words but EXCLUDE negation words
-combined_stopwords = english_stopwords.union(set(hindi_noise_words))
-
-# Remove negation words from stopwords to keep them in text
-stop_words = combined_stopwords.difference(negation_words)
-
-# Negation words are kept separately for explicit handling during preprocessing
-# You can use this list to implement negation scope detection or feature engineering
-
+# Combine English stopwords with Hindi noise words
+stop_words = english_stopwords.union(set(hindi_noise_words))
 
 # --- STEP 2: MODIFIED CLEANING FUNCTION ---
 
@@ -106,31 +103,34 @@ def vectorized_clean_series(s: pd.Series):
     s = s.str.normalize('NFKC')
     s = s.str.lower()
 
-    # initial cleanup (URLs, emails, etc.)
+    # 1. Initial cleanup (URLs, emails, HTML, numbers)
     s = s.str.replace(r'http\S+|www\.\S+', ' ', regex=True)
     s = s.str.replace(r'\S+@\S+', ' ', regex=True)
     s = s.str.replace(r'<.*?>', ' ', regex=True)
     s = s.str.replace(r'\d+(?:[.,]\d+)*', ' ', regex=True)
 
-    # romanized word mapping
+    # 2. HINGLISH MAPPING (Must happen before punctuation/tokenization)
+
     def replace_romanized_words(text):
         if not text:
             return ""
+        # The text is already lower-cased from a previous step
         words = text.split()
+
+        # Replace words based on the dictionary
         words = [romanized_mapping.get(word, word) for word in words]
+
         return ' '.join(words)
 
     s = s.apply(replace_romanized_words)
 
-    # remove non alpha except spaces
+    # 3. Final structural cleanup (Punctuation and whitespace)
     s = s.str.replace(r'[^a-z\s]', ' ', regex=True)
     s = s.str.replace(r'\s+', ' ', regex=True).str.strip()
 
-    # keep tokens that are NOT stopwords or that ARE negation words
-    s = s.apply(lambda x: ' '.join([
-        word for word in word_tokenize(x)
-        if (word not in stop_words) or (word in negation_words)
-    ]))
+    # 4. Tokenize and remove augmented stopwords
+
+    s = s.apply(lambda x: ' '.join([word for word in word_tokenize(x) if word not in stop_words and word]))
 
     return s
 
@@ -173,43 +173,35 @@ def preprocess_text(text):
 
 # Get sentiment score from the lexicon, default 0
 def get_sentiment_score(word):
-    return sentiment_lexicon.get(word, 0)
+    """
+    Returns sentiment score for a word, flipping the sentiment if the word is negated.
+    """
+    # Check if the word is negated (has '_neg' suffix)
+    is_negated = word.endswith("_neg")
+    word = word.replace("_neg", "")  # Remove '_neg' for lookup
+    
+    score = sentiment_lexicon.get(word, 0)  # Default score is 0 if word not found
+    
+    if is_negated:
+        score = -score  # Flip the sentiment score for negated words
+    
+    return score
+
 
 # Compound sentiment score for input text
-def calculate_compound_score_with_negation(text, negation_words=set()):
-    tokens = preprocess_text(text)
-    compound_score = 0.0
-    negate_scope = 0  # number of words to negate after negation word
-    NEGATION_WINDOW = 3  # number of words to invert after negation
-
-    for token in tokens:
-        score = get_sentiment_score(token)
-
-        # If current token is a negation word, enable negation window
-        if token in negation_words:
-            negate_scope = NEGATION_WINDOW
-            continue  # negation words themselves usually no polarity score
-
-        # If inside negation scope, invert polarity
-        if negate_scope > 0:
-            score = -score
-            negate_scope -= 1
-
-        compound_score += score
-
-    return compound_score
-
+def calculate_compound_score(text):
+    tokens = preprocess_text(text).split()
+    return sum(get_sentiment_score(token) for token in tokens)
 
 # Sentiment category from score
 def get_sentiment_category(text):
-    compound_score = calculate_compound_score_with_negation(text, negation_words)
+    compound_score = calculate_compound_score(text)
     if compound_score >= 0.05:
         return "Positive"
     elif compound_score <= -0.05:
         return "Negative"
     else:
         return "Neutral"
-
 
 # Assuming df_new_2['body'] is your input column
 df_new_2['body_sentiments'] = df_new_2['body'].apply(get_sentiment_category)
@@ -240,10 +232,38 @@ y_test = y.iloc[1008:]
 x_train['combined'] = x_train['title']+x_train['rating']+x_train['body']
 x_test['combined'] = x_test['title']+x_test['rating']+x_test['body']
 
-def preprocess(text):
-    if not isinstance(text, str):
-        return []
-    text = text.lower().translate(str.maketrans('', '', string.punctuation))  # remove punctuation
+negation_words = ['not', "n't", 'no', 'never', 'nothing', 'none', 'nowhere']
+def handle_negation_in_text(text):
+    """
+    This function handles negation in the input text.
+    It flips the sentiment of the words following negation words.
+    """
+    words = text.split()
+    negation_flag = False  # Flag to track if we're after a negation word
+    processed_words = []
+    
+    for word in words:
+        if word in negation_words:
+            negation_flag = True
+            processed_words.append(word)  # Add the negation word itself
+        elif negation_flag:
+            # If the word comes after a negation word, we flip its sentiment
+            # For simplicity, we'll append a special marker (e.g., '_neg') to denote the negated word
+            processed_words.append(word + "_neg")
+            negation_flag = False  # Reset after one negated word
+        else:
+            processed_words.append(word)
+    
+    return ' '.join(processed_words)
+
+
+def preprocess_text(text):
+    """
+    Preprocess the text by handling negations and cleaning the text.
+    """
+    text = text.lower()
+    text = text.translate(str.maketrans('', '', string.punctuation))  # remove punctuation
+    text = handle_negation_in_text(text)  # Handle negation
     return text.split()
 import math
 from collections import defaultdict
@@ -447,8 +467,11 @@ text_input = st.text_area("Enter text (one or more lines)", height=150)
 
 if st.button("Analyze Sentiment"):
     if text_input:
+        # Split text into lines, clean the lines and handle negations
         raw_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
         cleaned_lines = vectorized_clean_series(pd.Series(raw_lines)).tolist()
+        
+        # Get sentiment probabilities
         probabilities, classes = predict_sentiment_with_proba(cleaned_lines)
 
         for i, line in enumerate(raw_lines):
@@ -465,4 +488,3 @@ if st.button("Analyze Sentiment"):
             st.write("---")
     else:
         st.write("Please enter text.")
-
