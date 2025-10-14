@@ -418,14 +418,22 @@ text_input = st.text_area("Enter text (one or more lines)", height=150)
 
 if st.button("Analyze Sentiment"):
     if text_input:
-        text_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
-        probabilities, classes = predict_sentiment_with_proba(text_lines)
+        raw_lines = [line.strip() for line in text_input.split('\n') if line.strip()]
+        cleaned_lines = vectorized_clean_series(pd.Series(raw_lines)).tolist()
+        probabilities, classes = predict_sentiment_with_proba(cleaned_lines)
 
-        for i, line in enumerate(text_lines):
+        for i, line in enumerate(raw_lines):
             st.write(f"Input: **{line}**")
-            for label, prob in zip(classes, probabilities[i]):
-                st.write(f"- {label}: {prob*100:.2f}%")
+            
+            # Find the index of highest probability for this input
+            max_idx = probabilities[i].argmax()
+            
+            for idx, (label, prob) in enumerate(zip(classes, probabilities[i])):
+                if idx == max_idx:
+                    st.write(f"- **{label}: {prob*100:.2f}%**")
+                else:
+                    st.write(f"- {label}: {prob*100:.2f}%")
             st.write("---")
     else:
-        st.write("Please enter text to analyze.")
+        st.write("Please enter text.")
 
