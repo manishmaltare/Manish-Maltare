@@ -38,8 +38,6 @@ x_test = x.iloc[2336:2920]
 
 y_test = y.iloc[2336:2920]
 
-x_train.shape, x_test.shape, y_train.shape, y_test.shape
-
 params = {
     'n_estimators': 100,
     'learning_rate': 0.1,
@@ -54,73 +52,83 @@ model.fit(x_train, y_train)
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
+import streamlit as st
+import pandas as pd
+import numpy as np
+import pickle
+
 # --------------------------------------------------------
 # PAGE CONFIG
 # --------------------------------------------------------
 st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
 
-st.title("⚡ Solar Power Generation Prediction")
-st.markdown("""
-This app uses a **Gradient Boosting Regression Model**  
-to predict **solar power generated**.  
-All inputs are automatically **scaled using StandardScaler** before prediction.
-""")
+st.title("⚡ Solar Power Generation Prediction App")
 
 # --------------------------------------------------------
-# LOAD MODEL & SCALER
+# LOAD MODEL & SCALER PARAMS
 # --------------------------------------------------------
 @st.cache_resource
-def load_model_and_scaler():
+def load_model():
     with open("gradient_boosting_model.pkl", "rb") as f:
         model = pickle.load(f)
-    with open("scaler.pkl", "rb") as f:
-        scaler = pickle.load(f)
-    return model, scaler
+    return model
 
-model, scaler = load_model_and_scaler()
+@st.cache_resource
+def load_scaler():
+    with open("scaler_params.pkl", "rb") as f:
+        params = pickle.load(f)
+    return params
+
+model = load_model()
+scaler_params = load_scaler()
+
+means = scaler_params["means"]
+stds = scaler_params["stds"]
 
 # --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
-st.header("🔧 Enter Feature Values")
+st.subheader("Enter Feature Inputs")
 
-feature_names = [
-    'temperature',
-    'humidity',
-    'wind-speed',
-    'irradiance',
-    'average-wind-speed-(period)'
-]
+# Create input fields dynamically from feature list
+def user_input_features():
+    inputs = {}
+    for feature in means.keys():
+        inputs[feature] = st.number_input(
+            f"{feature}", 
+            value=float(means[feature]) if means[feature] is not None else 0.0
+        )
+    return pd.DataFrame([inputs])
 
-inputs = {}
-for feature in feature_names:
-    inputs[feature] = st.number_input(f"{feature}", value=0.0)
+# Get real-time user inputs
+user_df = user_input_features()
 
-if st.button("Predict"):
-    try:
-        # Create dataframe for inputs
-        input_df = pd.DataFrame([inputs])
-
-        # Scale features
-        scaled_input = scaler.transform(input_df)
-
-        # Predict
-        prediction = model.predict(scaled_input)[0]
-
-        st.success("Prediction Successful!")
-        st.metric("🔮 Predicted Power Generated", f"{prediction:.2f} units")
-
-    except Exception as e:
-        st.error(f"Error: {e}")
+st.write("### Raw Input Data")
+st.dataframe(user_df)
 
 # --------------------------------------------------------
-# FOOTER
+# MANUAL SCALING (Standard Scaler Formula)
 # --------------------------------------------------------
-st.markdown("---")
-st.markdown("""
-### 👨‍💻 Developer Notes
-- **X** = Scaled Feature Variables  
-- **y** = Target Variable *(power-generated)*  
-- Model: **Gradient Boosting Regressor**  
-- Scaling: **StandardScaler** applied before prediction  
-""")
+def manual_standard_scale(df):
+    scaled = df.copy()
+    for col in scaled.columns:
+        mean_val = means[col]
+        std_val = stds[col]
+        if std_val != 0:
+            scaled[col] = (scaled[col] - mean_val) / std_val
+        else:
+            scaled[col] = 0.0
+    return scaled
+
+scaled_user_df = manual_standard_scale(user_df)
+
+st.write("### Scaled Data (Used for Prediction)")
+st.dataframe(scaled_user_df)
+
+# --------------------------------------------------------
+# PREDICTION
+# --------------------------------------------------------
+if st.button("Predict Power Generation"):
+    prediction = model.predict(scaled_user_df)[0]
+    st.success(f"🌞 **Predicted Power Generated:** {prediction:.2f} kW")
+
