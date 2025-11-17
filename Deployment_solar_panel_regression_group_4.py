@@ -12,7 +12,7 @@ import pandas as pd
 import pickle
 from sklearn.ensemble import GradientBoostingRegressor
 
-df = pd.read_csv('/content/solarpowergeneration.csv')
+df = pd.read_csv('solarpowergeneration.csv')
 
 df['average-wind-speed-(period)'] = df['average-wind-speed-(period)'].fillna(df['average-wind-speed-(period)'].mean())
 
