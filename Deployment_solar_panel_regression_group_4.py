@@ -54,8 +54,6 @@ model.fit(x_train, y_train)
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
-import streamlit as st
-
 @st.cache_resource
 def load_model():
     with open("gradient_boosting_model.pkl", "rb") as f:
@@ -72,31 +70,32 @@ st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
 st.title("⚡ Solar Power Generation Prediction")
 st.markdown("""
 This app uses a **Gradient Boosting Regression Model**  
-to predict **solar power generated** based on various meteorological features.
+to predict **solar power generated**.  
+All inputs are automatically **scaled using StandardScaler** before prediction.
 """)
 
 # --------------------------------------------------------
-# LOAD MODEL
+# LOAD MODEL & SCALER
 # --------------------------------------------------------
 @st.cache_resource
-def load_model():
+def load_model_and_scaler():
     with open("gradient_boosting_model.pkl", "rb") as f:
         model = pickle.load(f)
-    return model
+    with open("scaler.pkl", "rb") as f:
+        scaler = pickle.load(f)
+    return model, scaler
 
-model = load_model()
+model, scaler = load_model_and_scaler()
 
 # --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
-st.header("🔧 Enter Feature Values Manually")
-st.markdown("Provide values for each feature below to predict power generation.")
+st.header("🔧 Enter Feature Values")
 
-# Feature names (modify based on your dataset)
 feature_names = [
-    'temperature', 
-    'humidity', 
-    'wind-speed', 
+    'temperature',
+    'humidity',
+    'wind-speed',
     'irradiance',
     'average-wind-speed-(period)'
 ]
@@ -105,14 +104,20 @@ inputs = {}
 for feature in feature_names:
     inputs[feature] = st.number_input(f"{feature}", value=0.0)
 
-# Prediction button
 if st.button("Predict"):
     try:
+        # Create dataframe for inputs
         input_df = pd.DataFrame([inputs])
-        prediction = model.predict(input_df)[0]
+
+        # Scale features
+        scaled_input = scaler.transform(input_df)
+
+        # Predict
+        prediction = model.predict(scaled_input)[0]
 
         st.success("Prediction Successful!")
         st.metric("🔮 Predicted Power Generated", f"{prediction:.2f} units")
+
     except Exception as e:
         st.error(f"Error: {e}")
 
@@ -122,7 +127,8 @@ if st.button("Predict"):
 st.markdown("---")
 st.markdown("""
 ### 👨‍💻 Developer Notes
-- **X** = Features  
-- **y** = Target variable *(power-generated)*  
-- Model used: **Gradient Boosting Regressor**  
+- **X** = Scaled Feature Variables  
+- **y** = Target Variable *(power-generated)*  
+- Model: **Gradient Boosting Regressor**  
+- Scaling: **StandardScaler** applied before prediction  
 """)
