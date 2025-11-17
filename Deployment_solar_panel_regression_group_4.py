@@ -52,11 +52,6 @@ model.fit(x_train, y_train)
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import pickle
-
 # --------------------------------------------------------
 # PAGE CONFIG
 # --------------------------------------------------------
@@ -65,7 +60,7 @@ st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
 st.title("⚡ Solar Power Generation Prediction App")
 
 # --------------------------------------------------------
-# LOAD MODEL & SCALER PARAMS
+# LOAD TRAINED MODEL ONLY
 # --------------------------------------------------------
 @st.cache_resource
 def load_model():
@@ -73,41 +68,56 @@ def load_model():
         model = pickle.load(f)
     return model
 
-@st.cache_resource
-def load_scaler():
-    with open("scaler_params.pkl", "rb") as f:
-        params = pickle.load(f)
-    return params
-
 model = load_model()
-scaler_params = load_scaler()
 
-means = scaler_params["means"]
-stds = scaler_params["stds"]
+# --------------------------------------------------------
+# MEANS & STDS (Replace with your actual values)
+# --------------------------------------------------------
+means = {
+    "distance-to-solar-noon": 0.0,
+    "temperature": 0.0,
+    "wind-direction": 0.0,
+    "wind-speed": 0.0,
+    "sky-cover": 0.0,
+    "visibility": 0.0,
+    "humidity": 0.0,
+    "average-wind-speed-(period)": 0.0,
+    "average-pressure-(period)": 0.0
+}
+
+stds = {
+    "distance-to-solar-noon": 1.0,
+    "temperature": 1.0,
+    "wind-direction": 1.0,
+    "wind-speed": 1.0,
+    "sky-cover": 1.0,
+    "visibility": 1.0,
+    "humidity": 1.0,
+    "average-wind-speed-(period)": 1.0,
+    "average-pressure-(period)": 1.0
+}
 
 # --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
 st.subheader("Enter Feature Inputs")
 
-# Create input fields dynamically from feature list
 def user_input_features():
     inputs = {}
     for feature in means.keys():
         inputs[feature] = st.number_input(
-            f"{feature}", 
-            value=float(means[feature]) if means[feature] is not None else 0.0
+            f"{feature.replace('-', ' ').title()}",
+            value=float(means[feature])
         )
     return pd.DataFrame([inputs])
 
-# Get real-time user inputs
 user_df = user_input_features()
 
 st.write("### Raw Input Data")
 st.dataframe(user_df)
 
 # --------------------------------------------------------
-# MANUAL SCALING (Standard Scaler Formula)
+# MANUAL STANDARD SCALING
 # --------------------------------------------------------
 def manual_standard_scale(df):
     scaled = df.copy()
@@ -122,7 +132,7 @@ def manual_standard_scale(df):
 
 scaled_user_df = manual_standard_scale(user_df)
 
-st.write("### Scaled Data (Used for Prediction)")
+st.write("### Scaled Input Data")
 st.dataframe(scaled_user_df)
 
 # --------------------------------------------------------
@@ -131,4 +141,3 @@ st.dataframe(scaled_user_df)
 if st.button("Predict Power Generation"):
     prediction = model.predict(scaled_user_df)[0]
     st.success(f"🌞 **Predicted Power Generated:** {prediction:.2f} kW")
-
