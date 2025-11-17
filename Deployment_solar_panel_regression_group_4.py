@@ -43,7 +43,7 @@ with open('gradient_boosting_model.pkl', 'wb') as f:
 st.set_page_config(page_title="Solar Panel Regression App", layout="wide")
 
 st.title("⚡ Solar Panel Regression App")
-st.subheader("Power Generation Prediction")
+st.subheader("Gradient Boosting Regression based : Power Generation Prediction")
 
 # --------------------------------------------------------
 # LOAD TRAINED MODEL
