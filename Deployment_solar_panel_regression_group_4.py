@@ -55,17 +55,7 @@ with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
 import streamlit as st
-st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
 
-st.title("⚡ Solar Power Generation Prediction")
-st.markdown("""
-This app uses a **Gradient Boosting Regression Model**
-to predict **solar power generated** based on various meteorological features.
-""")
-
-# --------------------------------------------------------
-# LOAD MODEL
-# --------------------------------------------------------
 @st.cache_resource
 def load_model():
     with open("gradient_boosting_model.pkl", "rb") as f:
