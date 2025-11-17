@@ -28,7 +28,7 @@ for col in scaled_df.select_dtypes(include=[np.number]).columns:
         scaled_df[col] = 0.0
 
 y = df['power-generated']
-x = df_features
+x = scaled_df
 
 x_train = x.iloc[0:2336]
 
