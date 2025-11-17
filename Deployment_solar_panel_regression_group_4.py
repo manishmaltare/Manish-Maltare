@@ -38,16 +38,64 @@ with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
 # --------------------------------------------------------
-# PAGE CONFIG
+# BEAUTIFUL MODERN UI LAYOUT
 # --------------------------------------------------------
-st.set_page_config(page_title="Solar Panel Regression App", layout="wide")
+import streamlit as st
+import pickle
+import pandas as pd
 
-st.title("⚡ Solar Panel Regression App")
-st.subheader("Gradient Boosting Regression based : Power Generation Prediction")
+# Page Config
+st.set_page_config(
+    page_title="Solar Panel Regression App",
+    page_icon="⚡",
+    layout="wide"
+)
 
-# --------------------------------------------------------
-# LOAD TRAINED MODEL
-# --------------------------------------------------------
+# Custom CSS Styling
+st.markdown("""
+    <style>
+        .main {
+            background-color: #f4f7fa;
+        }
+        .title-text {
+            font-size: 40px;
+            font-weight: 800;
+            color: #1B7F79;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+        .sub-text {
+            text-align: center;
+            font-size: 20px;
+            color: #333333;
+            margin-top: -15px;
+            padding-bottom: 20px;
+        }
+        .input-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+        .prediction-box {
+            background: #1B7F79;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+    </style>
+""",
+    unsafe_allow_html=True
+)
+
+st.markdown("<h1 class='title-text'>⚡ Solar Panel Regression App</h1>", unsafe_allow_html=True)
+st.markdown("<p class='sub-text'>Power Generation Prediction</p>", unsafe_allow_html=True)
+
+# Load model
 @st.cache_resource
 def load_model():
     with open("gradient_boosting_model.pkl", "rb") as f:
@@ -56,9 +104,7 @@ def load_model():
 
 model = load_model()
 
-# --------------------------------------------------------
-# MEANS & STDS
-# --------------------------------------------------------
+# Means and Stds
 means = {
     "distance-to-solar-noon": 0.0,
     "temperature": 0.0,
@@ -84,48 +130,54 @@ stds = {
 }
 
 # --------------------------------------------------------
-# USER INPUT SECTION
+# INPUT FORM IN A CARD
 # --------------------------------------------------------
-def user_input_features():
-    inputs = {}
-    for feature in means.keys():
+st.markdown("<div class='input-card'>", unsafe_allow_html=True)
+st.markdown("### 🌤 Enter Environmental Parameters")
+st.markdown("Provide values for the solar panel environment to predict power output.")
 
-        # SPECIAL HANDLING FOR distance-to-solar-noon
+cols = st.columns(3)
+
+user_input = {}
+feature_list = list(means.keys())
+
+for i, feature in enumerate(feature_list):
+    with cols[i % 3]:
+
         if feature == "distance-to-solar-noon":
-            inputs[feature] = st.number_input(
-                f"{feature.replace('-', ' ').title()}",
+            user_input[feature] = st.number_input(
+                feature.replace("-", " ").title(),
                 value=round(float(means[feature]), 15),
                 format="%.15f"
             )
         else:
-            inputs[feature] = st.number_input(
-                f"{feature.replace('-', ' ').title()}",
+            user_input[feature] = st.number_input(
+                feature.replace("-", " ").title(),
                 value=float(means[feature])
             )
 
-    return pd.DataFrame([inputs])
+st.markdown("</div>", unsafe_allow_html=True)
 
-user_df = user_input_features()
+user_df = pd.DataFrame([user_input])
 
 # --------------------------------------------------------
-# SCALING (IN BACKEND ONLY)
+# PROCESSING & PREDICTION
 # --------------------------------------------------------
 def manual_standard_scale(df):
     scaled = df.copy()
     for col in scaled.columns:
         mean_val = means[col]
         std_val = stds[col]
-        if std_val != 0:
-            scaled[col] = (scaled[col] - mean_val) / std_val
-        else:
-            scaled[col] = 0.0
+        scaled[col] = (scaled[col] - mean_val) / std_val if std_val != 0 else 0
     return scaled
 
 scaled_user_df = manual_standard_scale(user_df)
 
-# --------------------------------------------------------
-# PREDICTION
-# --------------------------------------------------------
-if st.button("Predict Power Generation"):
+# Prediction Button
+if st.button("🔍 Predict Power Generation", use_container_width=True):
     prediction = model.predict(scaled_user_df)[0]
-    st.success(f"🌞 **Predicted Power Generated:** {prediction:.2f} kW")
+
+    st.markdown(
+        f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
+        unsafe_allow_html=True
+    )
