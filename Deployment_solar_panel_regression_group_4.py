@@ -30,16 +30,6 @@ for col in scaled_df.select_dtypes(include=[np.number]).columns:
 y = df['power-generated']
 x = df_features
 
-y.isnull().sum()
-
-x.isnull().sum()
-
-y.shape, x.shape
-
-2920 * (80/100)
-
-2920-2336
-
 x_train = x.iloc[0:2336]
 
 y_train = y.iloc[0:2336]
