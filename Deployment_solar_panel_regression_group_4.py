@@ -93,7 +93,7 @@ st.markdown("""
 )
 
 st.markdown("<h1 class='title-text'>⚡ Solar Panel Regression App</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-text'>Power Generation Prediction</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-text'>Gradient Boosting Regression based Power Generation Prediction</p>", unsafe_allow_html=True)
 
 # Load model
 @st.cache_resource
