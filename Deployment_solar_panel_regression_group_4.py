@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import pickle
 from sklearn.ensemble import GradientBoostingRegressor
+import streamlit as st
 
 df = pd.read_csv('solarpowergeneration.csv')
 
@@ -97,7 +98,7 @@ stds = {
     "average-wind-speed-(period)": 1.0,
     "average-pressure-(period)": 1.0
 }
-import streamlit as st
+
 # --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
