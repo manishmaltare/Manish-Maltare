@@ -51,7 +51,8 @@ model.fit(x_train, y_train)
 # Pickle the trained model (saves the model object with all parameters and trained state)
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
-
+    
+import streamlit as st
 # --------------------------------------------------------
 # PAGE CONFIG
 # --------------------------------------------------------
