@@ -52,16 +52,16 @@ model.fit(x_train, y_train)
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
     
-import streamlit as st
 # --------------------------------------------------------
 # PAGE CONFIG
 # --------------------------------------------------------
-st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
+st.set_page_config(page_title="Solar Panel Regression App", layout="wide")
 
-st.title("⚡ Solar Power Generation Prediction App")
+st.title("⚡ Solar Panel Regression App")
+st.subheader("Power Generation Prediction")
 
 # --------------------------------------------------------
-# LOAD TRAINED MODEL ONLY
+# LOAD TRAINED MODEL
 # --------------------------------------------------------
 @st.cache_resource
 def load_model():
@@ -101,15 +101,23 @@ stds = {
 # --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
-st.subheader("Enter Feature Inputs")
-
 def user_input_features():
     inputs = {}
     for feature in means.keys():
-        inputs[feature] = st.number_input(
-            f"{feature.replace('-', ' ').title()}",
-            value=float(means[feature])
-        )
+
+        # SPECIAL HANDLING FOR distance-to-solar-noon
+        if feature == "distance-to-solar-noon":
+            inputs[feature] = st.number_input(
+                f"{feature.replace('-', ' ').title()}",
+                value=round(float(means[feature]), 15),
+                format="%.15f"   # <<<<<<<<<<<< 15-DIGIT PRECISION
+            )
+        else:
+            inputs[feature] = st.number_input(
+                f"{feature.replace('-', ' ').title()}",
+                value=float(means[feature])
+            )
+
     return pd.DataFrame([inputs])
 
 user_df = user_input_features()
@@ -118,7 +126,7 @@ st.write("### Raw Input Data")
 st.dataframe(user_df)
 
 # --------------------------------------------------------
-# MANUAL STANDARD SCALING
+# SCALING
 # --------------------------------------------------------
 def manual_standard_scale(df):
     scaled = df.copy()
