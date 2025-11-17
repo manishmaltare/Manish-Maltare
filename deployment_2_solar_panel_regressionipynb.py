@@ -73,19 +73,15 @@ print("Model and scaler saved successfully!")
 
 
 import streamlit as st
-import pickle
-import pandas as pd
 
 # --------------------------------------------------------
 # LOAD MODEL & SCALER
 # --------------------------------------------------------
 @st.cache_resource
 def load_artifacts():
-    # Load trained model
     with open("gradient_boosting_model.pkl", "rb") as f:
         model = pickle.load(f)
 
-    # Load scaler
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
 
@@ -100,19 +96,31 @@ feature_order = scaler["feature_order"]
 # --------------------------------------------------------
 # STREAMLIT UI
 # --------------------------------------------------------
-st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
-st.title("⚡ Solar Power Generation Prediction App")
+st.set_page_config(page_title="Solar Panel Regression App", layout="wide")
+st.title("⚡ Solar Panel Regression App")
 
-st.subheader("Enter Feature Inputs")
+st.subheader("Power Generation Prediction")
 
-# CREATES USER INPUT BOXES
+# --------------------------------------------------------
+# USER INPUT BOXES
+# --------------------------------------------------------
 def user_input_features():
     inputs = {}
     for feature in feature_order:
-        inputs[feature] = st.number_input(
-            feature.replace("-", " ").title(),
-            value=float(means[feature])  # default = mean
-        )
+
+        # Special rule → round input to 15 digits for distance-to-solar-noon
+        if feature == "distance-to-solar-noon":
+            inputs[feature] = st.number_input(
+                feature.replace("-", " ").title(),
+                value=round(float(means[feature]), 15),
+                format="%.15f"
+            )
+        else:
+            inputs[feature] = st.number_input(
+                feature.replace("-", " ").title(),
+                value=float(means[feature])
+            )
+
     return pd.DataFrame([inputs])
 
 user_df = user_input_features()
@@ -121,7 +129,7 @@ st.write("### Raw Input Data")
 st.dataframe(user_df)
 
 # --------------------------------------------------------
-# APPLY SAME SCALING AS TRAINING
+# APPLY SCALING
 # --------------------------------------------------------
 def scale_input(df):
     scaled = df.copy()
@@ -138,8 +146,6 @@ st.dataframe(scaled_user_df)
 # PREDICT
 # --------------------------------------------------------
 if st.button("Predict Power Generation"):
-    # Ensure columns are in correct order
     scaled_user_df = scaled_user_df[feature_order]
-
     prediction = model.predict(scaled_user_df)[0]
     st.success(f"🌞 **Predicted Power Generated:** {prediction:.2f} kW")
