@@ -80,8 +80,6 @@ model = load_model()
 st.header("🔧 Enter Feature Values")
 st.markdown("Provide values for each feature below to predict power generation.")
 
-uploaded_csv = st.file_uploader("Upload a CSV with feature values (Optional)", type=["csv"])
-
 # If user uploads a CSV, predict for whole file
 if uploaded_csv:
     df_input = pd.read_csv(uploaded_csv)
