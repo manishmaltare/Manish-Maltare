@@ -75,56 +75,56 @@ def load_model():
 model = load_model()
 
 # --------------------------------------------------------
+# PAGE CONFIG
+# --------------------------------------------------------
+st.set_page_config(page_title="Solar Power Prediction App", layout="wide")
+
+st.title("⚡ Solar Power Generation Prediction")
+st.markdown("""
+This app uses a **Gradient Boosting Regression Model**  
+to predict **solar power generated** based on various meteorological features.
+""")
+
+# --------------------------------------------------------
+# LOAD MODEL
+# --------------------------------------------------------
+@st.cache_resource
+def load_model():
+    with open("gradient_boosting_model.pkl", "rb") as f:
+        model = pickle.load(f)
+    return model
+
+model = load_model()
+
+# --------------------------------------------------------
 # USER INPUT SECTION
 # --------------------------------------------------------
-st.header("🔧 Enter Feature Values")
+st.header("🔧 Enter Feature Values Manually")
 st.markdown("Provide values for each feature below to predict power generation.")
 
-# If user uploads a CSV, predict for whole file
-if uploaded_csv:
-    df_input = pd.read_csv(uploaded_csv)
-    st.write("### Uploaded Data Preview")
-    st.dataframe(df_input.head())
+# Feature names (modify based on your dataset)
+feature_names = [
+    'temperature', 
+    'humidity', 
+    'wind-speed', 
+    'irradiance',
+    'average-wind-speed-(period)'
+]
 
-    # Prediction
+inputs = {}
+for feature in feature_names:
+    inputs[feature] = st.number_input(f"{feature}", value=0.0)
+
+# Prediction button
+if st.button("Predict"):
     try:
-        preds = model.predict(df_input)
-        df_input["Predicted Power Generated"] = preds
-        st.success("Prediction completed!")
-        st.write("### 🔮 Predictions")
-        st.dataframe(df_input)
+        input_df = pd.DataFrame([inputs])
+        prediction = model.predict(input_df)[0]
 
-        # Download
-        csv_download = df_input.to_csv(index=False)
-        st.download_button("📥 Download Predictions", data=csv_download,
-                           file_name="solar_predictions.csv",
-                           mime="text/csv")
+        st.success("Prediction Successful!")
+        st.metric("🔮 Predicted Power Generated", f"{prediction:.2f} units")
     except Exception as e:
         st.error(f"Error: {e}")
-
-else:
-    # Manual entry mode
-    st.markdown("Or **manually enter feature values** below:")
-
-    # Example feature set (replace with your actual columns)
-    feature_names = [
-        'temperature', 'humidity', 'wind-speed', 'irradiance',
-        'average-wind-speed-(period)'
-    ]
-
-    inputs = {}
-    for feature in feature_names:
-        inputs[feature] = st.number_input(f"{feature}", value=0.0)
-
-    if st.button("Predict"):
-        try:
-            input_df = pd.DataFrame([inputs])
-            prediction = model.predict(input_df)[0]
-
-            st.success("Prediction Successful!")
-            st.metric("🔮 Predicted Power Generated", f"{prediction:.2f} units")
-        except Exception as e:
-            st.error(f"Error: {e}")
 
 # --------------------------------------------------------
 # FOOTER
@@ -132,7 +132,7 @@ else:
 st.markdown("---")
 st.markdown("""
 ### 👨‍💻 Developer Notes
-- **X** = features
-- **y** = target variable *(power-generated)*
-- Model: **Gradient Boosting Regressor**
+- **X** = Features  
+- **y** = Target variable *(power-generated)*  
+- Model used: **Gradient Boosting Regressor**  
 """)
