@@ -40,8 +40,32 @@ for col in scaled_df.select_dtypes(include=[np.number]).columns:
         scaled_df[col] = 0.0
 
 # Split
-x_train = pd.read_csv('x_train.csv')
-y_train = pd.read_csv('y_train.csv')
+# ---------- Manual Split (80% train, 20% test) ----------
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Total number of samples
+n_samples = len(scaled_df)
+
+# Shuffle indices manually
+shuffled_indices = np.random.permutation(n_samples)
+
+# Compute train size (80%)
+train_size = int(0.8 * n_samples)
+
+# Train and test indices
+train_indices = shuffled_indices[:train_size]
+test_indices = shuffled_indices[train_size:]
+
+# Split X
+x_train = scaled_df.iloc[train_indices]
+x_test = scaled_df.iloc[test_indices]
+
+# Split y
+y_series = df["power-generated"]
+y_train = y_series.iloc[train_indices]
+y_test = y_series.iloc[test_indices]
+
 
 # Train Model
 model = GradientBoostingRegressor(
