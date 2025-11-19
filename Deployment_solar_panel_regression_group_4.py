@@ -85,7 +85,7 @@ st.markdown("""
 
 # Header
 st.markdown("<h1 class='title-text'>⚡ Solar Panel Regression App</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-text'>Gradient Boosting Regression based Power Generation Prediction</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-text'>Gradient Boosting based Power Generation Prediction</p>", unsafe_allow_html=True)
 
 
 # =========================================================
@@ -119,10 +119,21 @@ feature_list = list(means.keys())
 
 for i, feature in enumerate(feature_list):
     with cols[i % 3]:
-        user_input[feature] = st.number_input(
-            feature.replace("-", " ").title(),
-            value=float(means[feature])  # Default = training mean
-        )
+
+        # Special formatting for distance-to-solar-noon
+        if feature == "distance-to-solar-noon":
+            user_input[feature] = st.number_input(
+                feature.replace("-", " ").title(),
+                value=float(means[feature]),
+                format="%.15f"   # <<< 15 decimal places
+            )
+
+        else:
+            user_input[feature] = st.number_input(
+                feature.replace("-", " ").title(),
+                value=float(means[feature])
+            )
+
 
 st.markdown("</div>", unsafe_allow_html=True)
 
