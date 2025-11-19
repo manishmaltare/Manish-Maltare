@@ -4,6 +4,7 @@
 import numpy as np
 import pandas as pd
 import pickle
+from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingRegressor
 import streamlit as st
 
@@ -18,71 +19,45 @@ df['average-wind-speed-(period)'] = df['average-wind-speed-(period)'].fillna(
     df['average-wind-speed-(period)'].mean()
 )
 
-# Separate features & target
-df_features = df.drop(['power-generated'], axis=1)
+# Separate X and y
+X = df.drop(['power-generated'], axis=1)
 y = df['power-generated']
 
-# ---------- Compute REAL scaling (means & stds) ----------
-training_means = {}
-training_stds = {}
-
-scaled_df = df_features.copy()
-for col in scaled_df.select_dtypes(include=[np.number]).columns:
-    mean_val = scaled_df[col].mean()
-    std_val = scaled_df[col].std()
-
-    training_means[col] = mean_val
-    training_stds[col] = std_val
-
-    if std_val != 0:
-        scaled_df[col] = (scaled_df[col] - mean_val) / std_val
-    else:
-        scaled_df[col] = 0.0
-
-# Split
-# ---------- Manual Split (80% train, 20% test) ----------
-# Set random seed for reproducibility
+# ---------- Manual Split (80% Train / 20% Test) ----------
 np.random.seed(42)
+n_samples = len(X)
+indices = np.random.permutation(n_samples)
 
-# Total number of samples
-n_samples = len(scaled_df)
+train_size = int(0.80 * n_samples)
+train_idx = indices[:train_size]
+test_idx = indices[train_size:]
 
-# Shuffle indices manually
-shuffled_indices = np.random.permutation(n_samples)
+X_train = X.iloc[train_idx]
+y_train = y.iloc[train_idx]
 
-# Compute train size (80%)
-train_size = int(0.8 * n_samples)
+X_test = X.iloc[test_idx]
+y_test = y.iloc[test_idx]
 
-# Train and test indices
-train_indices = shuffled_indices[:train_size]
-test_indices = shuffled_indices[train_size:]
+# ---------- Fit ACTUAL STANDARD SCALER ----------
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Split X
-x_train = scaled_df.iloc[train_indices]
-x_test = scaled_df.iloc[test_indices]
-
-# Split y
-y_series = df["power-generated"]
-y_train = y_series.iloc[train_indices]
-y_test = y_series.iloc[test_indices]
-
-
-# Train Model
+# ---------- Train Model ----------
 model = GradientBoostingRegressor(
     learning_rate=0.1,
     max_depth=3,
     n_estimators=100,
     random_state=42
 )
-model.fit(x_train, y_train)
+model.fit(X_train_scaled, y_train)
 
-# Save model
+# ---------- Save Model + Scaler ----------
 with open('gradient_boosting_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
-# Save scaling values
-with open("scaling_values.pkl", "wb") as f:
-    pickle.dump((training_means, training_stds), f)
+with open("scaler.pkl", "wb") as f:
+    pickle.dump(scaler, f)
 
 
 # =========================================================
@@ -95,7 +70,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ----------------- Custom UI CSS -----------------
+# Custom CSS
 st.markdown("""
     <style>
         .main { background-color: #f4f7fa; }
@@ -107,13 +82,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Header
+# Title
 st.markdown("<h1 class='title-text'>⚡ Solar Panel Regression App</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-text'>Gradient Boosting based Power Generation Prediction</p>", unsafe_allow_html=True)
 
 
 # =========================================================
-# 3️⃣ LOAD MODEL + REAL MEANS & STDS
+# 3️⃣ LOAD MODEL + SCALER
 # =========================================================
 
 @st.cache_resource
@@ -121,12 +96,12 @@ def load_artifacts():
     with open("gradient_boosting_model.pkl", "rb") as f:
         model = pickle.load(f)
 
-    with open("scaling_values.pkl", "rb") as f:
-        means, stds = pickle.load(f)
+    with open("scaler.pkl", "rb") as f:
+        scaler = pickle.load(f)
 
-    return model, means, stds
+    return model, scaler
 
-model, means, stds = load_artifacts()
+model, scaler = load_artifacts()
 
 
 # =========================================================
@@ -135,71 +110,51 @@ model, means, stds = load_artifacts()
 
 st.markdown("<div class='input-card'>", unsafe_allow_html=True)
 st.markdown("### 🌤 Enter Environmental Parameters")
-st.markdown("Provide values for the solar panel environment to predict power output.")
+st.markdown("Provide values to predict solar power generation.")
 
 cols = st.columns(3)
-user_input = {}
-feature_list = list(means.keys())
+features = list(X.columns)
 
-for i, feature in enumerate(feature_list):
+user_inputs = {}
+for i, feature in enumerate(features):
     with cols[i % 3]:
 
-        # Special formatting for distance-to-solar-noon
+        # Special 15-decimal field
         if feature == "distance-to-solar-noon":
-            user_input[feature] = st.number_input(
-                feature.replace("-", " ").title(),
-                value=float(means[feature]),
-                format="%.15f"   # <<< 15 decimal places
+            user_inputs[feature] = st.number_input(
+                feature.title(),
+                value=0.0,
+                format="%.15f"
             )
-
         else:
-            user_input[feature] = st.number_input(
-                feature.replace("-", " ").title(),
-                value=float(means[feature])
+            user_inputs[feature] = st.number_input(
+                feature.title(),
+                value=0.0
             )
-
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-user_df = pd.DataFrame([user_input])
+user_df = pd.DataFrame([user_inputs])
 
 
 # =========================================================
-# 5️⃣ SCALING FUNCTION (REAL VALUES)
-# =========================================================
-
-def standard_scale(df):
-    scaled = df.copy()
-    for col in df.columns:
-        mean_val = means[col]
-        std_val = stds[col]
-
-        if std_val == 0:
-            scaled[col] = 0.0
-        else:
-            scaled[col] = (scaled[col] - mean_val) / std_val
-
-    return scaled
-
-scaled_user_df = standard_scale(user_df)
-
-
-# =========================================================
-# 6️⃣ PREDICTION
+# 5️⃣ APPLY SCALER + PREDICT
 # =========================================================
 
 if st.button("🔍 Predict Power Generation", use_container_width=True):
 
-    # Raw (non-scaled) values
     raw_values = user_df.to_numpy().flatten()
 
-    # Rule: All inputs = zero → output = zero
+    # If all zeros → prediction = zero
     if np.allclose(raw_values, 0.0):
         st.info("All inputs are zero — predicted power = 0 kW")
-        st.markdown("<div class='prediction-box'>🌞 Predicted Power: <br>0.00 kW</div>", unsafe_allow_html=True)
+        st.markdown("<div class='prediction-box'>🌞 Predicted Power: <br>0.00 kW</div>", 
+                    unsafe_allow_html=True)
 
     else:
-        prediction = model.predict(scaled_user_df)[0]
+        scaled_input = scaler.transform(user_df)
+        prediction = model.predict(scaled_input)[0]
+
         st.markdown(
             f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
             unsafe_allow_html=True
