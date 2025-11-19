@@ -193,9 +193,3 @@ if st.button("🔍 Predict Power Generation", use_container_width=True):
             f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
             unsafe_allow_html=True
         )
-
-
-    st.markdown(
-        f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
-        unsafe_allow_html=True
-    )
