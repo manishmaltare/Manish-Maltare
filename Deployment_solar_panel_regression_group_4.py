@@ -40,8 +40,8 @@ for col in scaled_df.select_dtypes(include=[np.number]).columns:
         scaled_df[col] = 0.0
 
 # Split
-x_train = scaled_df.iloc[0:2336]
-y_train = y.iloc[0:2336]
+x_train = pd.read_csv('x_train.csv')
+y_train = pd.read_csv('y_train.csv')
 
 # Train Model
 model = GradientBoostingRegressor(
