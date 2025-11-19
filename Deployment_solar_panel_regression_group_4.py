@@ -175,7 +175,25 @@ scaled_user_df = manual_standard_scale(user_df)
 
 # Prediction Button
 if st.button("🔍 Predict Power Generation", use_container_width=True):
-    prediction = model.predict(scaled_user_df)[0]
+
+    # Convert user input row to array
+    raw_values = user_df.to_numpy().flatten()
+
+    # 1️⃣ All-zero rule → output zero kW
+    if np.allclose(raw_values, 0.0):
+        st.info("All inputs are zero — predicted power = 0 kW")
+        st.markdown(
+            "<div class='prediction-box'>🌞 Predicted Power: <br>0.00 kW</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        # 2️⃣ Normal prediction
+        prediction = model.predict(scaled_user_df)[0]
+        st.markdown(
+            f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
+            unsafe_allow_html=True
+        )
+
 
     st.markdown(
         f"<div class='prediction-box'>🌞 Predicted Power: <br>{prediction:.2f} kW</div>",
