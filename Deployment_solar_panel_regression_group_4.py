@@ -8,7 +8,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 import streamlit as st
 
 # =========================================================
-# 1️⃣ LOAD CSV AND TRAIN MODEL
+#  LOAD CSV AND TRAIN MODEL
 # =========================================================
 
 df = pd.read_csv('solarpowergeneration.csv')
@@ -86,7 +86,7 @@ with open("scaling_values.pkl", "wb") as f:
 
 
 # =========================================================
-# 2️⃣ STREAMLIT UI
+# STREAMLIT
 # =========================================================
 
 st.set_page_config(
@@ -113,7 +113,7 @@ st.markdown("<p class='sub-text'>Gradient Boosting based Power Generation Predic
 
 
 # =========================================================
-# 3️⃣ LOAD MODEL + REAL MEANS & STDS
+#  LOAD MODEL + REAL MEANS & STDS
 # =========================================================
 
 @st.cache_resource
@@ -130,7 +130,7 @@ model, means, stds = load_artifacts()
 
 
 # =========================================================
-# 4️⃣ INPUT UI
+#  INPUT UI
 # =========================================================
 
 st.markdown("<div class='input-card'>", unsafe_allow_html=True)
@@ -165,7 +165,7 @@ user_df = pd.DataFrame([user_input])
 
 
 # =========================================================
-# 5️⃣ SCALING FUNCTION (REAL VALUES)
+# SCALING FUNCTION (REAL VALUES)
 # =========================================================
 
 def standard_scale(df):
@@ -185,7 +185,7 @@ scaled_user_df = standard_scale(user_df)
 
 
 # =========================================================
-# 6️⃣ PREDICTION
+# PREDICTION
 # =========================================================
 
 if st.button("🔍 Predict Power Generation", use_container_width=True):
