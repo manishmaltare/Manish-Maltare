@@ -8,3 +8,4 @@ nltk
 streamlit-lottie
 requests
 Pillow
+pickle
