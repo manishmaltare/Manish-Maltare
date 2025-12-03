@@ -1,3 +1,4 @@
+pickle
 streamlit
 scikit-learn
 pandas
@@ -8,4 +9,4 @@ nltk
 streamlit-lottie
 requests
 Pillow
-pickle
+
