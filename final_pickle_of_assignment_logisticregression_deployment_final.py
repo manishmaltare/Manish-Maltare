@@ -90,8 +90,7 @@ if st.button("Predict"):
         st.success(f"✅ The passenger is likely to **survive** with a probability of `{prob:.2f}`.")
     else:
         st.error(f"❌ The passenger is likely to **not survive** with a probability of `{1 - prob:.2f}`.")
-# =========================================================
-#  FOOTER
-# =========================================================
 
-st.markdown("<p class='footer-text'>App Created by <b>Manish Maltare</b></p>", unsafe_allow_html=True)
+# Footer
+st.markdown("---")
+st.markdown("<p style='text-align:center; font-size:16px;'>App Created by <b>Manish Maltare</b></p>", unsafe_allow_html=True)
