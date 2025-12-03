@@ -1,3 +1,9 @@
+# In your project directory (with app.py)
+git add logistic_regression_model.pkl
+git commit -m "Add trained model"
+git push origin main
+
+
 # -*- coding: utf-8 -*-
 """Pickle of ASSIGNMENT - LogisticRegression - Deployment - Final.ipynb
 
